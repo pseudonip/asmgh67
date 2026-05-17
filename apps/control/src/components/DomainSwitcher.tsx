@@ -25,7 +25,11 @@ export default function DomainSwitcher(props: DomainSwitcherProps) {
   const current = createMemo(() => {
     const noSelection = ["/app", "/app/zones"].includes(location.pathname);
     if (noSelection) return PLACEHOLDER;
-    return props.domains.find((d) => location.pathname.startsWith(`/app/zones/${d}`)) ?? PLACEHOLDER;
+    return (
+      props.domains.find((d) =>
+        location.pathname.startsWith(`/app/zones/${d}`),
+      ) ?? PLACEHOLDER
+    );
   });
 
   const handleChange = (value: string | null) => {
@@ -47,7 +51,9 @@ export default function DomainSwitcher(props: DomainSwitcherProps) {
         return (
           <SelectItem
             item={itemProps.item}
-            class={cn(itemProps.item.rawValue === ADD_DOMAIN && "text-muted-foreground")}
+            class={cn(
+              itemProps.item.rawValue === ADD_DOMAIN && "text-muted-foreground",
+            )}
           >
             {itemProps.item.rawValue === ADD_DOMAIN ? (
               <span class="flex items-center gap-2">
@@ -71,8 +77,17 @@ export default function DomainSwitcher(props: DomainSwitcherProps) {
       >
         <SelectValue<string>>
           {(state) => (
-            <span class={cn("text-sm", props.isCollapsed && "hidden", state.selectedOption() === PLACEHOLDER && "text-muted-foreground")}>
-              {state.selectedOption() === PLACEHOLDER ? "Select a domain" : state.selectedOption()}
+            <span
+              class={cn(
+                "text-sm",
+                props.isCollapsed && "hidden",
+                state.selectedOption() === PLACEHOLDER &&
+                  "text-muted-foreground",
+              )}
+            >
+              {state.selectedOption() === PLACEHOLDER
+                ? "Select a domain"
+                : state.selectedOption()}
             </span>
           )}
         </SelectValue>

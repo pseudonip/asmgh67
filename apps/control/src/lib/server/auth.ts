@@ -6,6 +6,7 @@ import { createHash, randomBytes } from "crypto";
 import { db } from "./db";
 import { sessions, users } from "./db/schema";
 import { getCookie, setCookie } from "@solidjs/start/http";
+import { getRequestEvent } from "solid-js/web";
 
 export async function register(email: string, password: string) {
   const emailExists = await db
@@ -80,7 +81,24 @@ export async function login(email: string, password: string) {
 }
 
 export async function getUser() {
-  const token = getCookie("token");
+  console.log("Attempting to get user from request");
+
+  const req = getRequestEvent()?.request;
+  console.log("Getting user for request:", req?.url);
+
+  let token;
+
+  try {
+    token = getCookie("token");
+  } catch (err) {
+    try {
+      const cookieHeader = req?.headers.get("cookie") ?? "";
+      token = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
+    } catch (err) {
+      console.error("Error parsing token from cookie header:", err);
+      throw new Error("Failed to get token from cookies");
+    }
+  }
 
   if (!token) {
     return null;

@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   customType,
   index,
@@ -44,6 +45,19 @@ export const nameservers = pgTable("nameservers", {
   ipv4: text("ipv4").notNull(),
   pool: text("pool").notNull().default("default"),
   auth_token_hash: bytea("auth_token_hash").notNull().unique(),
+});
+
+export const zones = pgTable("zones", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("apex").notNull().unique(),
+  status: text("status", { enum: ["active", "pending", "error"] })
+    .notNull()
+    .default("pending"),
+  serial: bigint("serial", { mode: "number" }).notNull().default(1),
+  nsPool: text("ns_pool").notNull().default("default"),
 });
 
 export type User = typeof users.$inferSelect;
