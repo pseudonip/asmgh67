@@ -1,7 +1,7 @@
-export default function Admin() {
+export default function App() {
   return (
     <main class="py-2 px-4">
-      <p>admin</p>
+      <p>app</p>
     </main>
   );
 }

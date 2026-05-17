@@ -16,17 +16,24 @@ export async function getNameservers() {
     throw new Error("Forbidden");
   }
 
-  const all = await db.select({
-    id: nameservers.id,
-    hostname: nameservers.hostname,
-    ipv4: nameservers.ipv4,
-    pool: nameservers.pool,
-  }).from(nameservers).execute();
+  const all = await db
+    .select({
+      id: nameservers.id,
+      hostname: nameservers.hostname,
+      ipv4: nameservers.ipv4,
+      pool: nameservers.pool,
+    })
+    .from(nameservers)
+    .execute();
 
   return all;
 }
 
-export async function addNameserver(hostname: string, ipv4: string, pool: string): Promise<string> {
+export async function addNameserver(
+  hostname: string,
+  ipv4: string,
+  pool: string,
+): Promise<string> {
   const user = await getUser();
 
   if (!user) {
@@ -40,12 +47,15 @@ export async function addNameserver(hostname: string, ipv4: string, pool: string
   const token = "rcns_" + randomBytes(32).toString("hex");
   const hash = createHash("sha256").update(token).digest();
 
-  await db.insert(nameservers).values({
-    hostname,
-    ipv4,
-    pool,
-    auth_token_hash: hash
-  }).execute();
+  await db
+    .insert(nameservers)
+    .values({
+      hostname,
+      ipv4,
+      pool,
+      auth_token_hash: hash,
+    })
+    .execute();
 
   return token;
 }

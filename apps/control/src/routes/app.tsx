@@ -1,7 +1,8 @@
 import { createSignal } from "solid-js";
 import { A, useLocation } from "@solidjs/router";
-import { ArrowBigLeft, LayoutDashboard, Server } from "lucide-solid";
+import { LayoutDashboard, Server } from "lucide-solid";
 import Nav from "~/components/Nav";
+import DomainSwitcher from "~/components/DomainSwitcher";
 
 export default function AdminLayout(props: { children: Node }) {
   const location = useLocation();
@@ -10,28 +11,20 @@ export default function AdminLayout(props: { children: Node }) {
   return (
     <div class="h-screen flex">
       <div class="w-50 border-r transition-all duration-300">
+        <div class="p-2">
+          <DomainSwitcher domains={["example.com", "example67.net"]} />
+        </div>
+
+        <hr class="my-2" />
+
         <Nav
           isCollapsed={isCollapsed()}
           links={[
             {
-              title: "Back to app",
-              icon: ArrowBigLeft,
-              variant: "ghost",
-              url: "/app",
-            },
-            {
               title: "Overview",
               icon: LayoutDashboard,
-              variant: location.pathname === "/admin" ? "default" : "ghost",
-              url: "/admin",
-            },
-            {
-              title: "Nameservers",
-              icon: Server,
-              variant: location.pathname.startsWith("/admin/ns")
-                ? "default"
-                : "ghost",
-              url: "/admin/ns",
+              variant: location.pathname === "/app" ? "default" : "ghost",
+              url: `/app`,
             },
           ]}
         />

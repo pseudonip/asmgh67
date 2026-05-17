@@ -16,7 +16,6 @@ import {
 } from "~/components/ui/text-field";
 import { login as serverLogin } from "~/lib/server/auth";
 
-// TODO: homepage
 export default function Login() {
   const navigate = useNavigate();
 

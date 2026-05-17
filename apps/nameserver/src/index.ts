@@ -31,7 +31,7 @@ await Bun.udpSocket({
   port: PORT,
   hostname: "0.0.0.0",
   socket: {
-    data(socket, data, port: number, address: string) {
+    data(socket: any, data: any, port: number, address: string) {
       const query = dnsPacket.decode(Buffer.from(data));
       console.log(`Received query from ${address}:${port}: `, query);
 
