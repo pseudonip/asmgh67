@@ -1,7 +1,10 @@
 {
   "name": "raincloud",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev:control": "bun --filter @raincloud/control dev",
     "dev:ns": "bun --filter @raincloud/nameserver dev",
