@@ -38,5 +38,14 @@ export const sessions = pgTable(
   ],
 );
 
+export const nameservers = pgTable("nameservers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  hostname: text("hostname").notNull().unique(),
+  ipv4: text("ipv4").notNull(),
+  pool: text("pool").notNull().default("default"),
+  auth_token_hash: bytea("auth_token_hash").notNull().unique(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
+export type Nameserver = typeof nameservers.$inferSelect;
