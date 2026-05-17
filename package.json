@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:control": "bun --filter @raincloud/control dev",
+    "dev:control": "bun --elide-lines=0 --filter @raincloud/control dev",
     "dev:ns": "bun --filter @raincloud/nameserver dev",
     "db:generate": "bun --filter @raincloud/control db:generate",
     "db:migrate": "bun --filter @raincloud/control db:migrate"

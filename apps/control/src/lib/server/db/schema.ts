@@ -12,9 +12,8 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: citext("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  is_admin: boolean("is_admin").notNull().default(false),
+  isAdmin: boolean("is_admin").notNull().default(false),
 });
-export type User = typeof users.$inferSelect;
 
 export const sessions = pgTable("sessions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -25,4 +24,6 @@ export const sessions = pgTable("sessions", {
   index("sessions_user_id_idx").on(t.userId),
   index("sessions_expires_at_idx").on(t.expires_at),
 ]);
+
+export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;

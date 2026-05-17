@@ -1,12 +1,9 @@
 import { useNavigate } from "@solidjs/router";
 
+// TODO: homepage
 export default function Home() {
   const navigate = useNavigate();
-  navigate("/dashboard");
+  navigate("/login");
 
-  return (
-    <main>
-      <p class="text-4xl">hello, world</p>
-    </main>
-  );
+  return;
 }
