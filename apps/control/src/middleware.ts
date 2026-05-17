@@ -1,5 +1,5 @@
 import { createMiddleware } from "@solidjs/start/middleware";
-import { getUser } from "./lib/server/auth";
+import { getUserFromToken } from "./lib/server/auth";
 import { redirect } from "@solidjs/router";
 
 export default createMiddleware({
@@ -13,19 +13,22 @@ export default createMiddleware({
       return;
     }
 
-    const user = await getUser();
+    const cookieHeader = event.request.headers.get("cookie") ?? "";
+    const token = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
+    const user = token ? await getUserFromToken(token) : null;
     event.locals.user = user;
 
     if (url.pathname.startsWith("/app") && !user) {
       return redirect("/login");
     }
 
-    if (url.pathname.startsWith("/admin") && (!user || !user!.isAdmin)) {
-      return redirect("/login");
+    if (url.pathname.startsWith("/admin")) {
+      if (!user) return redirect("/login");
+      if (!user.isAdmin) return redirect("/app");
     }
 
     if (url.pathname.startsWith("/login") && user) {
       return redirect("/app");
     }
-  }
+  },
 });

@@ -8,7 +8,11 @@ import { sessions, users } from "./db/schema";
 import { getCookie, setCookie } from "@solidjs/start/http";
 
 export async function register(email: string, password: string) {
-  const emailExists = await db.select().from(users).where(eq(users.email, email)).execute();
+  const emailExists = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
 
   if (emailExists.length > 0) {
     throw new Error("Email already in use");
@@ -16,10 +20,13 @@ export async function register(email: string, password: string) {
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const [user] = await db.insert(users).values({
-    email,
-    passwordHash,
-  }).returning();
+  const [user] = await db
+    .insert(users)
+    .values({
+      email,
+      passwordHash,
+    })
+    .returning();
 
   const token = randomBytes(32).toString("hex");
   const sha256 = createHash("sha256").update(token).digest();
@@ -39,7 +46,11 @@ export async function register(email: string, password: string) {
 }
 
 export async function login(email: string, password: string) {
-  const [user] = await db.select().from(users).where(eq(users.email, email)).execute();
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
 
   if (!user) {
     throw new Error("Invalid email or password");
@@ -77,10 +88,34 @@ export async function getUser() {
 
   const sha256 = createHash("sha256").update(token).digest();
 
-  const [session] = await db.select({ user: users })
+  const [session] = await db
+    .select({ user: users })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
-    .where(and(eq(sessions.tokenHash, sha256), gt(sessions.expires_at, new Date().toISOString())))
+    .where(
+      and(
+        eq(sessions.tokenHash, sha256),
+        gt(sessions.expires_at, new Date().toISOString()),
+      ),
+    )
+    .execute();
+
+  return session?.user || null;
+}
+
+export async function getUserFromToken(token: string) {
+  const sha256 = createHash("sha256").update(token).digest();
+
+  const [session] = await db
+    .select({ user: users })
+    .from(sessions)
+    .innerJoin(users, eq(sessions.userId, users.id))
+    .where(
+      and(
+        eq(sessions.tokenHash, sha256),
+        gt(sessions.expires_at, new Date().toISOString()),
+      ),
+    )
     .execute();
 
   return session?.user || null;
