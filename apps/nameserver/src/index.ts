@@ -1,4 +1,5 @@
 import dnsPacket from "dns-packet";
+import "dotenv/config";
 import handle from "./handle";
 import { State } from "./state";
 
@@ -6,31 +7,27 @@ const PORT = Number(process.env.PORT) || 5354;
 
 let state = new State();
 
-// placeholder data
-state.set({
-  name: "example.com",
-  serial: 1,
-  records: new Map([
-    ["example.com:A", [
-      {
-        name: "example.com",
-        type: "A",
-        data: { address: "1.1.1.1" },
-        ttl: 300,
-      }
-    ]],
-    ["test.example.com:TXT", [
-      {
-        name: "test.example.com",
-        type: "TXT",
-        data: { text: "hi" },
-        ttl: 300,
-      }
-    ]],
-  ]),
-});
+try {
+  const res = await fetch(`${process.env.CONTROL_SERVER}/api/dns/zones`, {
+    headers: {
+      "Authorization": `Bearer ${process.env.AUTH_TOKEN}`
+    }
+  });
 
-const udp = await Bun.udpSocket({
+  if (res.ok) {
+    const zones = await res.json();
+    console.log("Received zones from control server:", zones);
+    state.setState(zones);
+
+    console.log("Loaded zones from control server");
+  } else {
+    console.error("Failed to load zones from control server:", res.statusText);
+  }
+} catch (err) {
+  console.error("Error loading zones from control server:", err);
+}
+
+await Bun.udpSocket({
   port: PORT,
   hostname: "0.0.0.0",
   socket: {

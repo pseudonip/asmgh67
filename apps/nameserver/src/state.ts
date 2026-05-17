@@ -8,11 +8,19 @@ export type DnsRecord = {
 export type Zone = {
   name: string;
   serial: number;
-  records: Map<string, DnsRecord[]>;
+  records: Record<string, DnsRecord[]>;
 }
 
 export class State {
   private zones = new Map<string, Zone>();
+
+  setState(zones: Zone[]) {
+    this.zones.clear();
+
+    for (let zone of zones) {
+      this.zones.set(zone.name, zone);
+    }
+  }
 
   set(zone: Zone) {
     this.zones.set(zone.name, zone);
@@ -32,7 +40,7 @@ export class State {
   }
 
   hasName(zone: Zone, name: string): boolean {
-    for (let key of zone.records.keys()) {
+    for (let key of Object.keys(zone.records)) {
       if (key.startsWith(`${name}:`)) return true;
     }
 
@@ -41,6 +49,6 @@ export class State {
 
   lookup(zone: Zone, qname: string, qtype: string): DnsRecord[] {
     const key = `${qname}:${qtype}`;
-    return zone.records.get(key) || [];
+    return zone.records[key] || [];
   }
 }
