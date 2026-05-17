@@ -63,3 +63,4 @@ export const zones = pgTable("zones", {
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Nameserver = typeof nameservers.$inferSelect;
+export type Zone = typeof zones.$inferSelect;

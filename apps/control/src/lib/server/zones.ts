@@ -32,3 +32,30 @@ export async function createZone(name: string) {
     })
     .execute();
 }
+
+export async function getZone(name: string) {
+  const user = await getUser();
+
+  if (!user) {
+    console.log("Unauthorized attempt to get zone:", name);
+    throw new Error("Unauthorized");
+  }
+
+  const [zone] = await db
+    .select()
+    .from(zones)
+    .where(eq(zones.name, name))
+    .execute();
+
+  if (!zone) {
+    console.log("Zone not found:", name);
+    throw new Error("Zone not found");
+  }
+
+  if (zone.userId !== user.id) {
+    console.log("Unauthorized attempt to access zone:", name);
+    throw new Error("Unauthorized");
+  }
+
+  return zone;
+}

@@ -9,7 +9,7 @@ export default function AdminLayout(props: { children: Node }) {
 
   return (
     <div class="h-screen flex">
-      <Show when={!location.pathname == "/app/zones/new"}>
+      <Show when={location.pathname != "/app/zones/new"}>
         <div class="w-50 border-r transition-all duration-300">
           <div class="p-2">
             <DomainSwitcher domains={["example.com", "example67.net"]} />

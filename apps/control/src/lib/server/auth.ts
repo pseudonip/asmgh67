@@ -81,10 +81,7 @@ export async function login(email: string, password: string) {
 }
 
 export async function getUser() {
-  console.log("Attempting to get user from request");
-
   const req = getRequestEvent()?.request;
-  console.log("Getting user for request:", req?.url);
 
   let token;
 
