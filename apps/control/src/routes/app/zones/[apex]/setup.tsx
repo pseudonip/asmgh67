@@ -13,7 +13,7 @@ import {
 } from "~/components/ui/card";
 import { Check, X } from "lucide-solid";
 
-export default function ApexSetup() {
+export default function ZoneSetup() {
   const navigate = useNavigate();
   const zoneData = useZone();
 

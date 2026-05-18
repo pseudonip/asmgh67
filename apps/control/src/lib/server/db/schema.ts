@@ -3,6 +3,7 @@ import {
   boolean,
   customType,
   index,
+  jsonb,
   pgTable,
   text,
   uuid,
@@ -52,7 +53,7 @@ export const zones = pgTable("zones", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  name: text("apex").notNull().unique(),
+  name: text("name").notNull().unique(),
   status: text("status", { enum: ["active", "pending", "error"] })
     .notNull()
     .default("pending"),
@@ -60,7 +61,24 @@ export const zones = pgTable("zones", {
   nsPool: text("ns_pool").notNull().default("default"),
 });
 
+export type RecordData =
+  | { address: string } // A/AAAA
+  | { text: string } // TXT
+  | { target: string } // CNAME/NS/PTR
+// todo: finish record data
+
+export const records = pgTable("records", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  zoneId: uuid("zone_id")
+    .notNull()
+    .references(() => zones.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  data: jsonb("data").notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Nameserver = typeof nameservers.$inferSelect;
 export type Zone = typeof zones.$inferSelect;
+export type Record = typeof records.$inferSelect;

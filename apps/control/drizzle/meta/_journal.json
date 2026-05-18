@@ -22,6 +22,20 @@
       "when": 1779044942067,
       "tag": "0002_puzzling_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779129238870,
+      "tag": "0003_supreme_longshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779129677258,
+      "tag": "0004_smart_alice",
+      "breakpoints": true
     }
   ]
 }
