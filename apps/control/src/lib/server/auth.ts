@@ -115,6 +115,8 @@ export async function getUser() {
     )
     .execute();
 
+  delete session?.user.passwordHash;
+
   return session?.user || null;
 }
 
@@ -132,6 +134,8 @@ export async function getUserFromToken(token: string) {
       ),
     )
     .execute();
+
+  delete session?.user.passwordHash;
 
   return session?.user || null;
 }
