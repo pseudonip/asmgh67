@@ -49,7 +49,7 @@ export async function getZone(name: string) {
 
   if (!zone) {
     console.log("Zone not found:", name);
-    throw new Error("Zone not found");
+    return null;
   }
 
   if (zone.userId !== user.id) {
