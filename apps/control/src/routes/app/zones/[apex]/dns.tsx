@@ -53,6 +53,12 @@ export default function ZoneDNS() {
         if (d.type == "A") data = d.data?.address;
         if (d.type == "AAAA") data = d.data?.address;
 
+        if (d.type == "CNAME") data = d.data?.target;
+        if (d.type == "NS") data = d.data?.target;
+        if (d.type == "PTR") data = d.data?.target;
+
+        if (d.type == "TXT") data = d.data?.text;
+
         return { ...d, data }
       }) || [];
     },
@@ -79,8 +85,16 @@ export default function ZoneDNS() {
 
   const displayValue = () => {
     if (!rData()) return "";
+
     if (rType() == "A") return rData()?.address;
     if (rType() == "AAAA") return rData()?.address;
+
+    if (rType() == "CNAME") return rData()?.target;
+    if (rType() == "NS") return rData()?.target;
+    if (rType() == "PTR") return rData()?.target;
+
+    if (rType() == "TXT") return rData()?.text;
+
     return "";
   };
 
@@ -93,12 +107,13 @@ export default function ZoneDNS() {
     setError("");
 
     try {
-      await createRecord(zoneData()!.id, rName(), rType(), rData()!);
+      const record = await createRecord(zoneData()!.id, rName(), rType(), rData()!);
 
       setRName("");
       setRType("A");
       setRData(undefined);
 
+      setRecords((r) => [...r, record]);
     } catch (e) {
       setError("Failed to add record");
     }
@@ -124,7 +139,7 @@ export default function ZoneDNS() {
             <Select
               value={rType()}
               onChange={setRType}
-              options={["A", "AAAA"]}
+              options={["A", "AAAA", "CNAME", "NS", "PTR", "TXT"]}
               class="mt-1"
               itemComponent={(itemProps) => (
                 <SelectItem item={itemProps.item}>
@@ -155,6 +170,26 @@ export default function ZoneDNS() {
               <TextFieldInput
                 value={rData()?.address}
                 onInput={(e) => setRData({ address: e.currentTarget.value })}
+              />
+            </TextField>
+          </Show>
+
+          <Show when={rType() == "CNAME" || rType() == "NS" || rType() == "PTR"}>
+            <TextField>
+              <TextFieldLabel>Target</TextFieldLabel>
+              <TextFieldInput
+                value={rData()?.target}
+                onInput={(e) => setRData({ target: e.currentTarget.value })}
+              />
+            </TextField>
+          </Show>
+
+          <Show when={rType() == "TXT"}>
+            <TextField>
+              <TextFieldLabel>Text</TextFieldLabel>
+              <TextFieldInput
+                value={rData()?.text}
+                onInput={(e) => setRData({ text: e.currentTarget.value })}
               />
             </TextField>
           </Show>
