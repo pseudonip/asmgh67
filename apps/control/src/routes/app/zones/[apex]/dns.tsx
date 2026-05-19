@@ -19,23 +19,63 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createSignal, Show } from "solid-js";
-import { RecordData } from "~/lib/server/db/schema";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { Record, RecordData } from "~/lib/server/db/schema";
 import { Button } from "~/components/ui/button";
-import { createRecord } from "~/lib/server/records";
+import { createRecord, getZoneRecords } from "~/lib/server/records";
+import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
+
+export const columns: ColumnDef<Omit<Record, "auth_token_hash">>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+  },
+  {
+    accessorKey: "data",
+    header: "Data",
+  },
+];
 
 export default function ZoneDNS() {
-  const navigate = useNavigate();
   const zoneData = useZone();
+
+  const [records, setRecords] = createSignal<Record[]>([]);
+
+  const table = createSolidTable({
+    get data() {
+      return records().map((d) => {
+        let data = "";
+
+        if (d.type == "A") data = d.data?.address;
+        if (d.type == "AAAA") data = d.data?.address;
+
+        return { ...d, data }
+      }) || [];
+    },
+
+    get columns() {
+      return columns;
+    },
+
+    getCoreRowModel: getCoreRowModel()
+  })
+
+  onMount(async () => {
+    try {
+      setRecords(await getZoneRecords(zoneData()!.id));
+    } catch (e) {
+      setError("Failed to load records");
+    }
+  })
 
   const [rName, setRName] = createSignal("");
   const [rType, setRType] = createSignal("A");
   const [rData, setRData] = createSignal<RecordData>();
   const [error, setError] = createSignal<string>("");
-
-  if (zoneData()?.status == "pending") {
-    return navigate("setup");
-  }
 
   const displayValue = () => {
     if (!rData()) return "";
@@ -125,7 +165,63 @@ export default function ZoneDNS() {
         <Button class="mt-5 w-full mb-1" variant="outline" onClick={addRecord}>Add Record</Button>
       </div>
 
-      <div class="rounded-lg border mt-4 h-full">kaboom</div>
+      <div class="rounded-lg border mt-4 h-full">
+        <Table>
+          <TableHeader>
+            <For each={table.getHeaderGroups()}>
+              {(headerGroup) => (
+                <tr key={headerGroup.id}>
+                  <For each={headerGroup.headers}>
+                    {(header) => (
+                      <th
+                        key={header.id}
+                        class="h-10 px-2 text-left align-middle"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : header.column.columnDef.header}
+                      </th>
+                    )}
+                  </For>
+                </tr>
+              )}
+            </For>
+          </TableHeader>
+
+          <TableBody>
+            <Show
+              when={table.getRowModel().rows?.length}
+              fallback={
+                <TableRow>
+                  <TableCell colSpan={columns.length} class="h-24 text-center">
+                    No records found.
+                  </TableCell>
+                </TableRow>
+              }
+            >
+              <For each={table.getRowModel().rows}>
+                {(row) => (
+                  <TableRow key={row.id} class="group">
+                    <For each={row.getVisibleCells()}>
+                      {(cell) => (
+                        <TableCell
+                          key={cell.id}
+                          class="transition-colors group-hover:bg-muted/50"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      )}
+                    </For>
+                  </TableRow>
+                )}
+              </For>
+            </Show>
+          </TableBody>
+        </Table>
+      </div>
     </main>
   );
 }
