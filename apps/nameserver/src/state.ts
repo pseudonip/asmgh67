@@ -9,6 +9,7 @@ export type Zone = {
   name: string;
   serial: number;
   records: Record<string, DnsRecord[]>;
+  ns: string[];
 };
 
 export class State {

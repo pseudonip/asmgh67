@@ -20,6 +20,11 @@ export default function handle(query: Packet, state: State): Packet {
   const zone = state.findZone(qname);
   if (!zone) return errorResp(query, RCODES.NXDOMAIN);
 
+  const isApex = qname === zone.name;
+
+  if (isApex && qtype === "SOA") return soaResp(query, zone);
+  if (isApex && qtype === "NS") return nsResp(query, zone);
+
   const records = state.lookup(zone, qname, qtype);
 
   if (records.length > 0) return answerResp(query, zone, records);
@@ -71,7 +76,17 @@ function errorResp(query: Packet, rcode: RCODES) {
 function emptyResp(query: Packet, zone: Zone): Packet {
   let res = baseResp(query);
 
-  // todo: soa records
+  res.authorities = [{
+    name: zone.name,
+    type: "SOA",
+    ttl: 300,
+    class: "IN",
+    data: {
+      mname: process.env.SOA_MNAME!,
+      rname: process.env.SOA_RNAME!,
+      serial: zone.serial,
+    }
+  }]
 
   return res;
 }
@@ -91,6 +106,38 @@ function answerResp(query: Packet, zone: Zone, records: DnsRecord[]): Packet {
     class: "IN",
     ttl: record.ttl,
     data: toDnsData(record.type, record.data),
+  }));
+
+  return res;
+}
+
+function soaResp(query: Packet, zone: Zone): Packet {
+  const res = baseResp(query);
+
+  res.answers = [{
+    name: zone.name,
+    type: "SOA",
+    ttl: 300,
+    class: "IN",
+    data: {
+      mname: process.env.SOA_MNAME!,
+      rname: process.env.SOA_RNAME!,
+      serial: zone.serial,
+    }
+  }];
+
+  return res;
+}
+
+function nsResp(query: Packet, zone: Zone): Packet {
+  const res = baseResp(query);
+
+  res.answers = zone.ns.map((ns) => ({
+    name: zone.name,
+    type: "NS",
+    ttl: 300,
+    class: "IN",
+    data: ns
   }));
 
   return res;

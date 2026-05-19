@@ -25,6 +25,12 @@ export async function GET({ request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  const allNs = await db
+    .select()
+    .from(nameservers)
+    .where(eq(nameservers.pool, ns.pool))
+    .execute();
+
   const rows = await db
     .select({
       zoneId: zones.id,
@@ -49,6 +55,7 @@ export async function GET({ request }) {
         name: row.zoneName,
         serial: row.serial,
         records: {},
+        ns: allNs.map((ns) => ns.hostname),
       };
 
       byZone.set(row.zoneId, z);
@@ -58,7 +65,7 @@ export async function GET({ request }) {
     const key = `${fqdn}:${row.recordType}`;
 
     (z.records[key] ??= []).push({
-      name: row.recordName,
+      name: fqdn,
       type: row.recordType,
       data: row.recordData,
       ttl: 300,
