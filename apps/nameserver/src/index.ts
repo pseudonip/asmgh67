@@ -10,8 +10,8 @@ let state = new State();
 try {
   const res = await fetch(`${process.env.CONTROL_SERVER}/api/dns/zones`, {
     headers: {
-      "Authorization": `Bearer ${process.env.AUTH_TOKEN}`
-    }
+      Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
+    },
   });
 
   if (res.ok) {
@@ -35,12 +35,13 @@ await Bun.udpSocket({
       const query = dnsPacket.decode(Buffer.from(data));
       console.log(`Received query from ${address}:${port}: `, query);
 
-      const res = handle(query, state); console.log(res);
+      const res = handle(query, state);
+      console.log(res);
       const encoded = dnsPacket.encode(res);
 
       socket.send(encoded, port, address);
-    }
-  }
+    },
+  },
 });
 
 console.log(`DNS server is running on port ${PORT}`);

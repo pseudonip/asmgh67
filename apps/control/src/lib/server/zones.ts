@@ -136,7 +136,12 @@ export async function getZoneSetupStatus(name: string) {
         const missingNs = nsNames.filter((n) => !ns.includes(n));
         const extraNs = ns.filter((n) => !nsNames.includes(n));
 
-        return { complete: false, remove: extraNs, add: missingNs, added: nsNames.filter((n) => ns.includes(n)) };
+        return {
+          complete: false,
+          remove: extraNs,
+          add: missingNs,
+          added: nsNames.filter((n) => ns.includes(n)),
+        };
       }
     }
   } catch (err) {

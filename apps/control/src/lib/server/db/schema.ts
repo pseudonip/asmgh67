@@ -64,7 +64,7 @@ export const zones = pgTable("zones", {
 export type RecordData =
   | { address: string } // A/AAAA
   | { text: string } // TXT
-  | { target: string } // CNAME/NS/PTR
+  | { target: string }; // CNAME/NS/PTR
 // todo: finish record data
 
 export const records = pgTable("records", {

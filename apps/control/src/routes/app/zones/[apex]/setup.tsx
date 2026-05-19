@@ -66,7 +66,8 @@ export default function ZoneSetup() {
           <CardHeader class="space-y-1">
             <CardTitle class="text-2xl">Connect nameservers</CardTitle>
             <CardDescription>
-              Please add the following nameservers to your domain. It may take some time for the changes to propagate.
+              Please add the following nameservers to your domain. It may take
+              some time for the changes to propagate.
             </CardDescription>
           </CardHeader>
 
@@ -96,7 +97,9 @@ export default function ZoneSetup() {
             </div>
 
             <Show when={setupData()?.remove.length}>
-              <p>These nameservers might cause conflicts and should be removed:</p>
+              <p>
+                These nameservers might cause conflicts and should be removed:
+              </p>
 
               <div class="border rounded-lg">
                 <For each={setupData()?.remove}>

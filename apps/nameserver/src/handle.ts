@@ -59,7 +59,7 @@ function baseResp(query: Packet): Packet {
     answers: [],
     authorities: [],
     additionals: [],
-  }
+  };
 }
 
 function errorResp(query: Packet, rcode: RCODES) {
@@ -85,7 +85,7 @@ function nxResp(query: Packet, zone: Zone): Packet {
 function answerResp(query: Packet, zone: Zone, records: DnsRecord[]): Packet {
   let res = baseResp(query);
 
-  res.answers = records.map(record => ({
+  res.answers = records.map((record) => ({
     name: record.name,
     type: record.type as any,
     class: "IN",

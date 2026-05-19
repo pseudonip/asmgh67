@@ -28,8 +28,22 @@ export default function AdminLayout(props: { children: Node }) {
                 {
                   title: "Overview",
                   icon: LayoutDashboard,
-                  variant: location.pathname === `/app/zones/${location.pathname.split("/")[3]}` ? "default" : "ghost",
+                  variant:
+                    location.pathname ===
+                    `/app/zones/${location.pathname.split("/")[3]}`
+                      ? "default"
+                      : "ghost",
                   url: `/app/zones/${location.pathname.split("/")[3]}`,
+                },
+                {
+                  title: "DNS",
+                  icon: Server,
+                  variant:
+                    location.pathname ===
+                    `/app/zones/${location.pathname.split("/")[3]}/dns`
+                      ? "default"
+                      : "ghost",
+                  url: `/app/zones/${location.pathname.split("/")[3]}/dns`,
                 },
               ]}
             />
