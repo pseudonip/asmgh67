@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { createHash } from "crypto";
 import { db } from "~/lib/server/db";
-import { nameservers } from "~/lib/server/db/schema";
+import { nameservers, records, zones } from "~/lib/server/db/schema";
 
 export async function GET({ request }) {
   console.log("Received request for zones");
@@ -15,45 +15,55 @@ export async function GET({ request }) {
   const token = auth.split(" ")[1];
   const hash = createHash("sha256").update(token).digest();
 
-  const ns = await db
+  const [ns] = await db
     .select()
     .from(nameservers)
     .where(eq(nameservers.auth_token_hash, hash))
     .execute();
 
-  if (ns.length === 0) {
+  if (!ns) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  // placeholder
-  const zones = [
-    {
-      name: "example.com",
-      serial: 1,
-      records: {
-        "example.com:A": [
-          {
-            name: "example.com",
-            type: "A",
-            data: { address: "1.1.1.1" },
-            ttl: 300,
-          },
-        ],
-        "test.example.com:TXT": [
-          {
-            name: "test.example.com",
-            type: "TXT",
-            data: { text: "hi" },
-            ttl: 300,
-          },
-        ],
-      },
-    },
-  ];
+  const rows = await db
+    .select({
+      zoneId: zones.id,
+      zoneName: zones.name,
+      serial: zones.serial,
+      recordName: records.name,
+      recordType: records.type,
+      recordData: records.data,
+    })
+    .from(zones)
+    .leftJoin(records, eq(records.zoneId, zones.id))
+    .where(and(eq(zones.nsPool, ns.pool), eq(zones.status, "active")))
+    .execute();
 
-  return new Response(JSON.stringify(zones), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const byZone = new Map();
+
+  for (const row of rows) {
+    let z = byZone.get(row.zoneId);
+
+    if (!z) {
+      z = {
+        name: row.zoneName,
+        serial: row.serial,
+        records: {},
+      };
+
+      byZone.set(row.zoneId, z);
+    }
+
+    const fqdn = row.recordName == "@" ? row.zoneName : `${row.recordName}.${row.zoneName}`;
+    const key = `${fqdn}:${row.recordType}`;
+
+    (z.records[key] ??= []).push({
+      name: row.recordName,
+      type: row.recordType,
+      data: row.recordData,
+      ttl: 300,
+    });
+  }
+
+  return Response.json([...byZone.values()]);
 }
