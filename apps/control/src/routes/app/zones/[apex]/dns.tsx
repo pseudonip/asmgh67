@@ -72,7 +72,7 @@ export default function ZoneDNS() {
 
   onMount(async () => {
     try {
-      setRecords(await getZoneRecords(zoneData()!.id));
+      setRecords((await getZoneRecords(zoneData()!.id)).sort((a, b) => a.name.localeCompare(b.name)));
     } catch (e) {
       setError("Failed to load records");
     }
