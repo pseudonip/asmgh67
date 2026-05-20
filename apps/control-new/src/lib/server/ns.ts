@@ -1,7 +1,7 @@
 "use server";
 
 import { createHash, randomBytes } from "crypto";
-import { getUser } from "./auth";
+import { getUser } from "./auth.actions";
 import { db } from "./db";
 import { nameservers } from "./db/schema";
 

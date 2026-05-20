@@ -14,32 +14,25 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { register as serverRegister } from "~/lib/server/auth";
+import { login as serverLogin } from "~/lib/server/auth.actions";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
-  const [confirmPassword, setConfirmPassword] = createSignal("");
-
   const [error, setError] = createSignal("");
 
-  async function register() {
+  async function login() {
     setError("");
 
-    if (!email() || !password() || !confirmPassword()) {
+    if (!email() || !password()) {
       setError("Please fill in all fields.");
       return;
     }
 
-    if (password() !== confirmPassword()) {
-      setError("Passwords do not match.");
-      return;
-    }
-
     try {
-      await serverRegister(email(), password());
+      await serverLogin(email(), password());
       navigate("/app");
     } catch (err) {
       setError(
@@ -49,14 +42,14 @@ export default function Login() {
   }
 
   return (
-    <main class="w-full h-screen flex">
+    <main class="w-full h-screen flex px-2">
       <div class="m-auto">
         <Card>
           <CardHeader class="space-y-1">
-            <CardTitle class="text-2xl">Create an account</CardTitle>
+            <CardTitle class="text-2xl">Log in</CardTitle>
             <CardDescription>
-              Enter your email and password to register. Already have an
-              account? <a href="/login">Log in</a>
+              Log into your account. Don't have one?{" "}
+              <a href="/register">Create an account</a>
             </CardDescription>
           </CardHeader>
 
@@ -78,21 +71,13 @@ export default function Login() {
                 onInput={(e) => setPassword(e.currentTarget.value)}
               />
             </TextField>
-            <TextField class="grid gap-2">
-              <TextFieldLabel>Confirm Password</TextFieldLabel>
-              <TextFieldInput
-                type="password"
-                value={confirmPassword()}
-                onInput={(e) => setConfirmPassword(e.currentTarget.value)}
-              />
-            </TextField>
 
             <p class="text-sm text-ctp-red -mb-2">{error()}</p>
           </CardContent>
 
           <CardFooter>
-            <Button class="w-full" onClick={register}>
-              Register
+            <Button class="w-full" onClick={login}>
+              Log in
             </Button>
           </CardFooter>
         </Card>

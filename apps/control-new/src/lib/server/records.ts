@@ -1,7 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { getUser } from "./auth";
+import { getUser } from "./auth.actions";
 import { db } from "./db";
 import { Record, RecordData, records, zones } from "./db/schema";
 

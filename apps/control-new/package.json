@@ -1,12 +1,12 @@
 {
-  "name": "@raincloud/control-old",
+  "name": "@raincloud/control",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "start": "vite start",
-    "preview": "vite preview",
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "preview": "vinxi preview",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
@@ -14,8 +14,7 @@
     "@kobalte/core": "^0.13.11",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.0",
-    "@solidjs/start": "2.0.0-alpha.2",
-    "@solidjs/vite-plugin-nitro-2": "^0.1.0",
+    "@solidjs/start": "1.3.2",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/solid-table": "^8.21.3",
     "bcrypt": "^6.0.0",
@@ -28,7 +27,7 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "vite": "^7.0.0"
+    "vinxi": "^0.5.7"
   },
   "engines": {
     "node": ">=22"
