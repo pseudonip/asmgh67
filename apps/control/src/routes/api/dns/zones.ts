@@ -42,7 +42,7 @@ export async function GET({ request }) {
     })
     .from(zones)
     .leftJoin(records, eq(records.zoneId, zones.id))
-    .where(and(eq(zones.nsPool, ns.pool), eq(zones.status, "active")))
+    .where(eq(zones.nsPool, ns.pool))
     .execute();
 
   const byZone = new Map();
