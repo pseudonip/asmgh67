@@ -1,4 +1,7 @@
 import { createHash } from "crypto";
+import { eq } from "drizzle-orm";
+import { db } from "~/lib/server/db";
+import { nameservers } from "~/lib/server/db/schema";
 
 type Send = (data: unknown, eventName?: string) => void;
 const streams = new Map<string, Set<Send>>();
@@ -7,14 +10,22 @@ export async function GET({ request }) {
   const auth = request.headers.get("Authorization");
 
   if (!auth || !auth.startsWith("Bearer ")) {
-    //return new Response("Unauthorized", { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
-  //const token = auth.split(" ")[1];
-  //const hash = createHash("sha256").update(token).digest();
+  const token = auth.split(" ")[1];
+  const hash = createHash("sha256").update(token).digest();
 
-  // todo replace hardcoded
-  const hostname = "ns1.cyteon.dev";
+  const [ns] = await db.select()
+    .from(nameservers)
+    .where(eq(nameservers.auth_token_hash, hash))
+    .execute();
+
+  if (!ns) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  console.log(`Nameserver ${ns.hostname} connected to SSE stream`);
 
   const encoder = new TextEncoder();
 
@@ -27,10 +38,10 @@ export async function GET({ request }) {
         controller.enqueue(encoder.encode(payload));
       };
 
-      if (!streams.has(hostname)) {
-        streams.set(hostname, new Set([send]));
+      if (!streams.has(ns.hostname)) {
+        streams.set(ns.hostname, new Set([send]));
       } else {
-        streams.get(hostname)!.add(send);
+        streams.get(ns.hostname)!.add(send);
       }
 
       const heartbeat = setInterval(() => {
@@ -38,11 +49,11 @@ export async function GET({ request }) {
       }, 30000); // every 30sec
 
       request.signal.addEventListener("abort", () => {
-        streams.get(hostname)!.delete(send);
+        streams.get(ns.hostname)!.delete(send);
         clearInterval(heartbeat);
         controller.close();
 
-        console.log(`Nameserver ${hostname} disconnected`);
+        console.log(`Nameserver ${ns.hostname} disconnected`);
       });
     }
   });
