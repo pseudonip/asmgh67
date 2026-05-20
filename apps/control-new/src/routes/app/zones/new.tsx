@@ -14,7 +14,7 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createZone } from "~/lib/server/zones";
+import { createZone } from "~/lib/server/zones.actions";
 
 export default function NewZone() {
   const navigate = useNavigate();

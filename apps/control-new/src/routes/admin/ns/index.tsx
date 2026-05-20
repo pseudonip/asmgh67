@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { getNameservers } from "~/lib/server/ns";
+import { getNameservers } from "~/lib/server/ns.actions";
 
 export const columns: ColumnDef<Omit<Nameserver, "auth_token_hash">>[] = [
   {

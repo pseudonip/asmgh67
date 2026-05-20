@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { createResource } from "solid-js";
-import { getZone } from "~/lib/server/zones";
+import { getZone } from "~/lib/server/zones.actions";
 import { ZoneContext } from "./[apex]/context";
 
 export default function ZoneLayout(props: { children: any }) {

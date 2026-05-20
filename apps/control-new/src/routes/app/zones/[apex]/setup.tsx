@@ -1,6 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import { useZone } from "./context";
-import { getZoneSetupStatus } from "~/lib/server/zones";
+import { getZoneSetupStatus } from "~/lib/server/zones.actions";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {

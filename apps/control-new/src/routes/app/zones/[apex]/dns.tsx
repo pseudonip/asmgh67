@@ -22,7 +22,7 @@ import {
 import { createSignal, For, onMount, Show } from "solid-js";
 import { Record, RecordData } from "~/lib/server/db/schema";
 import { Button } from "~/components/ui/button";
-import { createRecord, getZoneRecords } from "~/lib/server/records";
+import { createRecord, getZoneRecords } from "~/lib/server/records.actions";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 
 export const columns: ColumnDef<Omit<Record, "auth_token_hash">>[] = [

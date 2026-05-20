@@ -13,7 +13,7 @@ import {
   TextFieldLabel,
 } from "~/components/ui/text-field";
 import { Show } from "solid-js/web";
-import { addNameserver } from "~/lib/server/ns";
+import { addNameserver } from "~/lib/server/ns.actions";
 
 export default function AddNs() {
   const [hostname, setHostname] = createSignal("");

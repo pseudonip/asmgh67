@@ -3,7 +3,7 @@ import { A, useLocation } from "@solidjs/router";
 import { LayoutDashboard, Server } from "lucide-solid";
 import Nav from "../../../control-new/src/components/Nav";
 import DomainSwitcher from "../../../control-new/src/components/DomainSwitcher";
-import { getUserZones } from "~/lib/server/zones";
+import { getUserZones } from "~/lib/server/zones.actions";
 
 export default function AdminLayout(props: { children: Node }) {
   const location = useLocation();
