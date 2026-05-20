@@ -28,15 +28,13 @@ export async function register(email: string, password: string) {
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  try {
-    const [user] = await db
-      .insert(users)
-      .values({
-        email,
-        passwordHash,
-      })
-      .returning();
-  }
+  const [user] = await db
+    .insert(users)
+    .values({
+      email,
+      passwordHash,
+    })
+    .returning();
 
   const token = randomBytes(32).toString("hex");
   const sha256 = createHash("sha256").update(token).digest();
