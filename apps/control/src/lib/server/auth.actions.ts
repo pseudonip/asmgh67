@@ -11,25 +11,32 @@ import { users, sessions } from "./db/schema";
 import { getUserFromToken } from "./auth.server";
 
 export async function register(email: string, password: string) {
-  const emailExists = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email))
-    .execute();
+  try {
+    const emailExists = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .execute();
 
-  if (emailExists.length > 0) {
-    throw new Error("Email already in use");
+    if (emailExists.length > 0) {
+      throw new Error("Email already in use");
+    }
+  } catch (err) {
+    console.error("Error checking email existence:", err);
+    throw new Error("An error occurred while creating your account");
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const [user] = await db
-    .insert(users)
-    .values({
-      email,
-      passwordHash,
-    })
-    .returning();
+  try {
+    const [user] = await db
+      .insert(users)
+      .values({
+        email,
+        passwordHash,
+      })
+      .returning();
+  }
 
   const token = randomBytes(32).toString("hex");
   const sha256 = createHash("sha256").update(token).digest();
