@@ -1,12 +1,12 @@
 import { eq } from "drizzle-orm";
-
 import { db } from "./db";
 import {
   Record,
-  RecordData,
   records,
   zones,
 } from "./db/schema";
+import { RecordData } from "@raincloud/types/records";
+import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
 async function verifyZoneOwnership(
   userId: string,
@@ -48,6 +48,8 @@ export async function createRecordForUser(
     })
     .returning()
     .execute();
+
+  await sendZoneUpdate(zoneId);
 
   return record;
 }

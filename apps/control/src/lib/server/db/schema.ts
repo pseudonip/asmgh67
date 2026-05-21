@@ -9,6 +9,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { RecordData } from "@raincloud/types/records";
+
 const citext = customType<{ data: string }>({
   dataType: () => "citext",
 });
@@ -61,12 +63,6 @@ export const zones = pgTable("zones", {
   nsPool: text("ns_pool").notNull().default("default"),
 });
 
-export type RecordData =
-  | { address: string } // A/AAAA
-  | { text: string } // TXT
-  | { target: string }; // CNAME/NS/PTR
-// todo: finish record data
-
 export const records = pgTable("records", {
   id: uuid("id").primaryKey().defaultRandom(),
   zoneId: uuid("zone_id")
@@ -74,7 +70,7 @@ export const records = pgTable("records", {
     .references(() => zones.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   type: text("type").notNull(),
-  data: jsonb("data").notNull(),
+  data: jsonb("data").$type<RecordData>().notNull(),
 });
 
 export type User = typeof users.$inferSelect;

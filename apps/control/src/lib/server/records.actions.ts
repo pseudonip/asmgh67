@@ -7,7 +7,8 @@ import {
   getRecordsForUser,
 } from "./records.server";
 
-import { Record, RecordData } from "./db/schema";
+import { Record } from "./db/schema";
+import { RecordData, validateRecordData } from "@raincloud/types/records";
 
 async function requireUser() {
   const user = await getUser();
@@ -25,6 +26,12 @@ export async function createRecord(
   type: string,
   data: RecordData,
 ) {
+  const result = validateRecordData(type, data);
+
+  if (!result.ok) {
+    throw new Error(result.error);
+  }
+
   const user = await requireUser();
 
   return await createRecordForUser(

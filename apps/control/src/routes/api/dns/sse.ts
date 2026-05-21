@@ -1,10 +1,11 @@
 import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "~/lib/server/db";
-import { nameservers } from "~/lib/server/db/schema";
+import { nameservers, records, zones } from "~/lib/server/db/schema";
+import { SerializedRecord, SerializedZone, ServerEventMap, ServerEventName } from "@raincloud/types/sse";
 
-type Send = (data: unknown, eventName?: string) => void;
-const streams = new Map<string, Set<Send>>();
+type Send = <E extends ServerEventName>(event: E, data: ServerEventMap[E]) => void;
+const streams: Map<string, Set<Send>> = (globalThis as any).__sseStreams ??= new Map();
 
 export async function GET({ request }) {
   const auth = request.headers.get("Authorization");
@@ -31,25 +32,26 @@ export async function GET({ request }) {
 
   const stream = new ReadableStream({
     start(controller) {
-      const send = (data: unknown, eventName?: string) => {
-        let payload = "";
-        if (eventName) payload += `event: ${eventName}\n`;
-        payload += `data: ${JSON.stringify(data)}\n\n`;
+      const send: Send = (event, data) => {
+        let payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
         controller.enqueue(encoder.encode(payload));
       };
 
-      if (!streams.has(ns.hostname)) {
-        streams.set(ns.hostname, new Set([send]));
+      if (!streams.has(ns.pool)) {
+        streams.set(ns.pool, new Set([send]));
       } else {
-        streams.get(ns.hostname)!.add(send);
+        streams.get(ns.pool)!.add(send);
       }
+
+      console.log(streams);
 
       const heartbeat = setInterval(() => {
         controller.enqueue(encoder.encode(": ping\n\n"));
       }, 30000); // every 30sec
 
       request.signal.addEventListener("abort", () => {
-        streams.get(ns.hostname)!.delete(send);
+        streams.get(ns.pool)!.delete(send);
+
         clearInterval(heartbeat);
         controller.close();
 
@@ -65,4 +67,72 @@ export async function GET({ request }) {
       Connection: "keep-alive",
     },
   });
+}
+
+export async function sendZoneDeletion(zoneName: string, pool: string) {
+  const poolStreams = streams.get(pool);
+
+  if (poolStreams) {
+    for (const send of poolStreams) {
+      send("deleteZone", { name: zoneName });
+    }
+  }
+}
+
+export async function sendZoneUpdate(zoneId: string) {
+  console.log(`Sending zone update for zone ${zoneId}`);
+
+  const [zoneData] = await db.select({
+    name: zones.name,
+    serial: zones.serial,
+    nsPool: zones.nsPool,
+  })
+    .from(zones)
+    .where(eq(zones.id, zoneId))
+    .execute();
+
+  const ns = await db.select({
+    hostname: nameservers.hostname,
+  })
+    .from(nameservers)
+    .where(eq(nameservers.pool, zoneData.nsPool))
+    .execute();
+
+  const zoneRecords = await db.select()
+    .from(records)
+    .where(eq(records.zoneId, zoneId))
+    .execute();
+
+  const recordMap: Record<string, SerializedRecord[]> = {};
+
+  for (const r of zoneRecords) {
+    if (!recordMap[r.name]) {
+      recordMap[r.name] = [];
+    }
+
+    recordMap[r.name].push({
+      name: r.name,
+      type: r.type,
+      data: r.data,
+      ttl: 300
+    });
+  }
+
+  const data: SerializedZone = {
+    name: zoneData.name,
+    serial: zoneData.serial,
+    records: recordMap,
+    ns: ns.map((n) => n.hostname),
+  }
+
+  const poolStreams = streams.get(zoneData.nsPool);
+
+  console.log(streams);
+  console.log(`Found ${poolStreams?.size ?? 0} stream(s) for pool ${zoneData.nsPool}`);
+
+  if (poolStreams) {
+    for (const send of poolStreams) {
+      send("updateZone", data);
+    }
+  }
 }

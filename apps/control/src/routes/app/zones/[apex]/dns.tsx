@@ -20,7 +20,8 @@ import {
   TextFieldLabel,
 } from "~/components/ui/text-field";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { Record, RecordData } from "~/lib/server/db/schema";
+import { Record } from "~/lib/server/db/schema";
+import { RecordData } from "@raincloud/types/records";
 import { Button } from "~/components/ui/button";
 import { createRecord, getZoneRecords } from "~/lib/server/records.actions";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
@@ -115,7 +116,7 @@ export default function ZoneDNS() {
 
       setRecords((r) => [...r, record]);
     } catch (e) {
-      setError("Failed to add record");
+      setError("Failed to add record: " + (e instanceof Error ? e.message : String(e)));
     }
   }
 
@@ -129,7 +130,7 @@ export default function ZoneDNS() {
         <p class="text-muted-foreground text-sm">
           {rName() ? (rName() == "@" ? zoneData()?.name : `${rName()}.${zoneData()?.name}`) : "[record name]"}{" "}
           will be an {rType()} record pointing to{" "}
-          {displayValue().length > 0 ? displayValue() : "[target]"}
+          {displayValue()?.length > 0 ? displayValue() : "[target]"}
         </p>
 
         <div class="flex w-full gap-4 mt-4">
@@ -195,7 +196,7 @@ export default function ZoneDNS() {
           </Show>
         </div>
 
-        <p class="text-sm text-ctp-red mt-2">{error()}</p>
+        <p class="text-sm text-ctp-red mt-4">{error()}</p>
 
         <Button class="mt-5 w-full mb-1" variant="outline" onClick={addRecord}>Add Record</Button>
       </div>

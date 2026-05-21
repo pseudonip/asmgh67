@@ -1,0 +1,13 @@
+{
+  "name": "@raincloud/types",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sse": "./src/sse.ts",
+    "./records": "./src/records.ts"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}
