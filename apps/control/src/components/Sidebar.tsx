@@ -1,5 +1,5 @@
 import { useLocation } from "@solidjs/router";
-import { Globe, Home, List } from "lucide-solid";
+import { Globe, Home, List, Server } from "lucide-solid";
 import { createSignal, Show } from "solid-js";
 import { cn } from "~/lib/utils";
 import DomainSwitcher from "./DomainSwitcher";
@@ -49,6 +49,12 @@ export default function Sidebar(props: SidebarProps) {
       icon: Home,
       variant: variant((p) => p === "/admin"),
     },
+    {
+      title: "Nameservers",
+      url: "/admin/ns",
+      icon: Server,
+      variant: variant((p) => p === "/admin/ns"),
+    }
   ];
 
   return (

@@ -60,7 +60,7 @@ export default function DomainSwitcher(props: DomainSwitcherProps) {
                 itemProps.item.rawValue === ADD_DOMAIN &&
                   "mt-1 pt-2 text-muted-foreground",
                 itemProps.item.rawValue !== ADD_DOMAIN &&
-                  "font-mono text-[12.5px]",
+                  "font-mono text-[13px]",
               )}
             >
               {itemProps.item.rawValue === ADD_DOMAIN ? (
@@ -99,7 +99,7 @@ export default function DomainSwitcher(props: DomainSwitcherProps) {
                 }
               >
                 <Globe class="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <span class="truncate font-mono text-[12.5px] mt-px">
+                <span class="truncate font-mono text-[13px]">
                   {state.selectedOption()}
                 </span>
               </Show>

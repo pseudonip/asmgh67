@@ -126,6 +126,10 @@
   }
 }
 
+* {
+    font-family: 'Satoshi', sans-serif;
+}
+
 a:not(.btn) {
   @apply text-primary;
 }
