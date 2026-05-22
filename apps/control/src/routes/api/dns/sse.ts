@@ -163,7 +163,7 @@ export async function sendZoneUpdate(zoneId: string) {
     }
 
     recordMap[key].push({
-      name: r.name,
+      name: fqdn,
       type: r.type,
       data: r.data,
       ttl,

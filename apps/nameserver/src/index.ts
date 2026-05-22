@@ -33,14 +33,18 @@ await Bun.udpSocket({
   hostname: "0.0.0.0",
   socket: {
     data(socket: any, data: any, port: number, address: string) {
-      const query = dnsPacket.decode(Buffer.from(data));
-      console.log(`Received query from ${address}:${port}: `, query);
+      try {
+        const query = dnsPacket.decode(Buffer.from(data));
+        console.log(`Received query from ${address}:${port}: `, query);
 
-      const res = handle(query, state);
-      console.log(res);
-      const encoded = dnsPacket.encode(res);
+        const res = handle(query, state);
+        console.log(res);
+        const encoded = dnsPacket.encode(res);
 
-      socket.send(encoded, port, address);
+        socket.send(encoded, port, address);
+      } catch (err) {
+        console.error("Failed to handle DNS query: ", err);
+      }
     },
   },
 });
