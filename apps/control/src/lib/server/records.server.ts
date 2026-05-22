@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
-import { Record, records, zones } from "./db/schema";
+import { Record, records, Zone, zones } from "./db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
-async function verifyZoneOwnership(userId: string, zoneId: string) {
+async function verifyZoneOwnership(userId: string, zoneId: string): Promise<Zone> {
   const [zone] = await db
     .select()
     .from(zones)
@@ -57,4 +57,25 @@ export async function getRecordsForUser(
     .from(records)
     .where(eq(records.zoneId, zoneId))
     .execute();
+}
+
+export async function deleteRecordForUser(userId: string, recordId: string) {
+  const [record] = await db
+    .select()
+    .from(records)
+    .where(eq(records.id, recordId))
+    .execute();
+
+  if (!record) {
+    throw new Error("Record not found");
+  }
+
+  const zone = await verifyZoneOwnership(userId, record.zoneId);
+
+  await db
+    .delete(records)
+    .where(eq(records.id, recordId))
+    .execute();
+
+  await sendZoneUpdate(zone.id);
 }

@@ -83,7 +83,7 @@ export default function Sidebar(props: SidebarProps) {
 
       <div
         class={cn(
-          "px-2 pt-3 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground",
+          "px-2 pt-5 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground",
           collapsed() && "sr-only",
         )}
       >

@@ -23,28 +23,54 @@ import { createSignal, For, onMount, Show } from "solid-js";
 import { Record } from "~/lib/server/db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { Button } from "~/components/ui/button";
-import { createRecord, getZoneRecords } from "~/lib/server/records.actions";
+import { createRecord, deleteRecord, getZoneRecords } from "~/lib/server/records.actions";
 import {
   ColumnDef,
   createSolidTable,
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table";
-import { Plus } from "lucide-solid";
+import { Plus, Trash } from "lucide-solid";
 
-export const columns: ColumnDef<Omit<Record, "auth_token_hash">>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
+export const columns: ColumnDef<Record>[] = [
   {
     accessorKey: "type",
     header: "Type",
   },
   {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
     accessorKey: "data",
     header: "Data",
   },
+  {
+    accessorKey: "ttl",
+    header: "TTL",
+  },
+  {
+    id: "actions",
+    header: "",
+    cell: (info) => {
+      const record = info.row.original;
+
+      return (
+        <div class="flex gap-2 justify-end">
+          <button onClick={async () => {
+            try {
+              await deleteRecord(record.id);
+              info.table.options.meta?.deleteRecord(record.id);
+            } catch (e) {
+              console.error("Failed to delete record:", e);
+            }
+          }} class="hover:text-ctp-red transition-all duration-300">
+            <Trash size={16} />
+          </button>
+        </div>
+      );
+    }
+  }
 ];
 
 export default function ZoneDNS() {
@@ -77,13 +103,19 @@ export default function ZoneDNS() {
     },
 
     getCoreRowModel: getCoreRowModel(),
+
+    meta: {
+      deleteRecord: (id: string) => {
+        setRecords((recs) => recs.filter((r) => r.id !== id));
+      }
+    }
   });
 
   onMount(async () => {
     try {
       setRecords(
         (await getZoneRecords(zoneData()!.id)).sort((a, b) =>
-          a.name.localeCompare(b.name),
+          a.type.localeCompare(b.type),
         ),
       );
     } catch (e) {
@@ -115,7 +147,7 @@ export default function ZoneDNS() {
 
   async function addRecord() {
     if (!rName() || !rData()) {
-      setError("Record name and data are required");
+      setError("Record name and data is required");
       return;
     }
 
@@ -149,7 +181,7 @@ export default function ZoneDNS() {
     <main class="p-4 flex flex-col h-screen">
       <h1 class="text-2xl ml-1 leading-none">Manage DNS</h1>
 
-      <div class="rounded-xl border border-border bg-card p-4.5 mt-4">
+      <div class="rounded-xl border border-border bg-card p-4 pb-3 px-6 mt-4">
         <div class="flex">
           <h2 class="text-lg">Add Record</h2>
 
@@ -189,7 +221,7 @@ export default function ZoneDNS() {
           </div>
 
           <TextField class="w-1/5">
-            <TextFieldLabel>Record name</TextFieldLabel>
+            <TextFieldLabel>Name</TextFieldLabel>
             <TextFieldInput
               value={rName()}
               onInput={(e) => setRName(e.currentTarget.value)}
@@ -198,7 +230,7 @@ export default function ZoneDNS() {
             />
           </TextField>
 
-          <div class="w-full">
+          <div class="flex-1">
             <Show when={rType() == "A" || rType() == "AAAA"}>
               <TextField>
                 <TextFieldLabel>IPv{rType() == "A" ? "4" : "6"}</TextFieldLabel>
@@ -271,17 +303,17 @@ export default function ZoneDNS() {
         <p class="text-sm text-ctp-red mt-2">{error()}</p>
       </div>
 
-      <div class="rounded-lg border mt-4 h-full">
+      <div class="mt-4 overflow-hidden rounded-xl border border-border bg-card">
         <Table>
           <TableHeader>
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
-                <tr key={headerGroup.id}>
+                <tr key={headerGroup.id} class="border-b border-border bg-muted/40 text-left text-[12.5px] font-medium uppercase tracking-wider text-muted-foreground">
                   <For each={headerGroup.headers}>
                     {(header) => (
                       <th
                         key={header.id}
-                        class="h-10 px-2 text-left align-middle"
+                        class="h-10 px-4 text-left align-middle"
                       >
                         {header.isPlaceholder
                           ? null
@@ -312,7 +344,7 @@ export default function ZoneDNS() {
                       {(cell) => (
                         <TableCell
                           key={cell.id}
-                          class="transition-colors group-hover:bg-muted/50"
+                          class="transition-colors group-hover:bg-muted/50 px-4"
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
