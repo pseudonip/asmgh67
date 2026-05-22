@@ -48,17 +48,32 @@ export async function GET({ request }) {
       console.log(streams);
 
       const heartbeat = setInterval(() => {
-        controller.enqueue(encoder.encode(": ping\n\n"));
+        try {
+          controller.enqueue(encoder.encode(": ping\n\n"));
+        } catch (e) {
+          console.error("Error sending heartbeat:", e);
+          this.cleanup?.();
+        }
       }, 30000); // every 30sec
 
-      request.signal.addEventListener("abort", () => {
+      this.cleanup = () => {
         streams.get(ns.pool)!.delete(send);
 
         clearInterval(heartbeat);
         controller.close();
 
         console.log(`Nameserver ${ns.hostname} disconnected`);
+      }
+
+      request.signal.addEventListener("abort", () => {
+        console.log("Request aborted by client");
+        this.cleanup?.();
       });
+    },
+
+    cancel() {
+      console.log("Stream cancelled by client");
+      this.cleanup?.();
     }
   });
 
