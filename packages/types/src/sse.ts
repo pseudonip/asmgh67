@@ -5,18 +5,18 @@ export type SerializedRecord = {
   type: string;
   data: RecordData;
   ttl: number;
-}
+};
 
 export type SerializedZone = {
   name: string;
   serial: number;
   records: Record<string, SerializedRecord[]>;
   ns: string[];
-}
+};
 
 export type ServerEventMap = {
   updateZone: SerializedZone;
-  deleteZone: { name: string }
-}
+  deleteZone: { name: string };
+};
 
 export type ServerEventName = keyof ServerEventMap;

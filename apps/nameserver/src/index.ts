@@ -91,7 +91,8 @@ while (true) {
           let data = "";
 
           for (const line of frame.split("\n")) {
-            if (line.startsWith("event:")) event = line.slice(6).trim() as ServerEventName;
+            if (line.startsWith("event:"))
+              event = line.slice(6).trim() as ServerEventName;
             else if (line.startsWith("data:")) data += line.slice(5).trim();
           }
 

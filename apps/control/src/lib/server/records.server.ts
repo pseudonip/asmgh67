@@ -1,17 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
-import {
-  Record,
-  records,
-  zones,
-} from "./db/schema";
+import { Record, records, zones } from "./db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
-async function verifyZoneOwnership(
-  userId: string,
-  zoneId: string,
-) {
+async function verifyZoneOwnership(userId: string, zoneId: string) {
   const [zone] = await db
     .select()
     .from(zones)

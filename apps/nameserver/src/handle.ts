@@ -76,17 +76,19 @@ function errorResp(query: Packet, rcode: RCODES) {
 function emptyResp(query: Packet, zone: Zone): Packet {
   let res = baseResp(query);
 
-  res.authorities = [{
-    name: zone.name,
-    type: "SOA",
-    ttl: 300,
-    class: "IN",
-    data: {
-      mname: process.env.SOA_MNAME!,
-      rname: process.env.SOA_RNAME!,
-      serial: zone.serial,
-    }
-  }]
+  res.authorities = [
+    {
+      name: zone.name,
+      type: "SOA",
+      ttl: 300,
+      class: "IN",
+      data: {
+        mname: process.env.SOA_MNAME!,
+        rname: process.env.SOA_RNAME!,
+        serial: zone.serial,
+      },
+    },
+  ];
 
   return res;
 }
@@ -114,17 +116,19 @@ function answerResp(query: Packet, zone: Zone, records: DnsRecord[]): Packet {
 function soaResp(query: Packet, zone: Zone): Packet {
   const res = baseResp(query);
 
-  res.answers = [{
-    name: zone.name,
-    type: "SOA",
-    ttl: 300,
-    class: "IN",
-    data: {
-      mname: process.env.SOA_MNAME!,
-      rname: process.env.SOA_RNAME!,
-      serial: zone.serial,
-    }
-  }];
+  res.answers = [
+    {
+      name: zone.name,
+      type: "SOA",
+      ttl: 300,
+      class: "IN",
+      data: {
+        mname: process.env.SOA_MNAME!,
+        rname: process.env.SOA_RNAME!,
+        serial: zone.serial,
+      },
+    },
+  ];
 
   return res;
 }
@@ -137,7 +141,7 @@ function nsResp(query: Packet, zone: Zone): Packet {
     type: "NS",
     ttl: 300,
     class: "IN",
-    data: ns
+    data: ns,
   }));
 
   return res;

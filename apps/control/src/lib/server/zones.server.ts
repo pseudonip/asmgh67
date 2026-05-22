@@ -4,10 +4,7 @@ import { resolveNs } from "node:dns/promises";
 import { db } from "./db";
 import { nameservers, zones } from "./db/schema";
 
-export async function createZoneForUser(
-  userId: string,
-  name: string,
-) {
+export async function createZoneForUser(userId: string, name: string) {
   const existingZone = await db
     .select()
     .from(zones)
@@ -27,10 +24,7 @@ export async function createZoneForUser(
     .execute();
 }
 
-export async function getZoneForUser(
-  userId: string,
-  name: string,
-) {
+export async function getZoneForUser(userId: string, name: string) {
   const [zone] = await db
     .select()
     .from(zones)
@@ -56,10 +50,7 @@ export async function getZonesForUser(userId: string) {
     .execute();
 }
 
-export async function getZoneSetupStatusForUser(
-  userId: string,
-  name: string,
-) {
+export async function getZoneSetupStatusForUser(userId: string, name: string) {
   const [zone] = await db
     .select()
     .from(zones)

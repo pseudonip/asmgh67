@@ -10,15 +10,20 @@ export const recordSchemas = {
 };
 
 export type RecordType = keyof typeof recordSchemas;
-export const SUPPORTED_RECORD_TYPES = Object.keys(recordSchemas) as RecordType[];
+export const SUPPORTED_RECORD_TYPES = Object.keys(
+  recordSchemas,
+) as RecordType[];
 
 export type RecordData = {
   [K in RecordType]: z.infer<(typeof recordSchemas)[K]>;
 }[RecordType];
 
-export function validateRecordData(type: string, data: unknown):
-  | { ok: true, type: RecordType, data: RecordData }
-  | { ok: false, error: string } {
+export function validateRecordData(
+  type: string,
+  data: unknown,
+):
+  | { ok: true; type: RecordType; data: RecordData }
+  | { ok: false; error: string } {
   if (!(type in recordSchemas)) {
     return { ok: false, error: `Unsupported record type: ${type}` };
   }
@@ -27,8 +32,15 @@ export function validateRecordData(type: string, data: unknown):
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    return { ok: false, error: result.error.issues.map(i => i.message).join(", ") };
+    return {
+      ok: false,
+      error: result.error.issues.map((i) => i.message).join(", "),
+    };
   }
 
-  return { ok: true, type: type as RecordType, data: result.data as RecordData };
+  return {
+    ok: true,
+    type: type as RecordType,
+    data: result.data as RecordData,
+  };
 }

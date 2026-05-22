@@ -1,10 +1,7 @@
 "use server";
 
 import { getUser } from "./auth.actions";
-import {
-  createNameserver,
-  listNameservers,
-} from "./ns.server";
+import { createNameserver, listNameservers } from "./ns.server";
 
 async function requireAdmin() {
   const user = await getUser();

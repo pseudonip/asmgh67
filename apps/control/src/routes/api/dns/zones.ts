@@ -63,7 +63,10 @@ export async function GET({ request }) {
 
     if (!row.recordName) continue;
 
-    const fqdn = row.recordName == "@" ? row.zoneName : `${row.recordName}.${row.zoneName}`;
+    const fqdn =
+      row.recordName == "@"
+        ? row.zoneName
+        : `${row.recordName}.${row.zoneName}`;
     const key = `${fqdn}:${row.recordType}`;
 
     (z.records[key] ??= []).push({

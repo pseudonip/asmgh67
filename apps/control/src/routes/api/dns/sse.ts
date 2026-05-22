@@ -2,10 +2,19 @@ import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "~/lib/server/db";
 import { nameservers, records, zones } from "~/lib/server/db/schema";
-import { SerializedRecord, SerializedZone, ServerEventMap, ServerEventName } from "@raincloud/types/sse";
+import {
+  SerializedRecord,
+  SerializedZone,
+  ServerEventMap,
+  ServerEventName,
+} from "@raincloud/types/sse";
 
-type Send = <E extends ServerEventName>(event: E, data: ServerEventMap[E]) => void;
-const streams: Map<string, Set<Send>> = (globalThis as any).__sseStreams ??= new Map();
+type Send = <E extends ServerEventName>(
+  event: E,
+  data: ServerEventMap[E],
+) => void;
+const streams: Map<string, Set<Send>> = ((globalThis as any).__sseStreams ??=
+  new Map());
 
 export async function GET({ request }) {
   const auth = request.headers.get("Authorization");
@@ -17,7 +26,8 @@ export async function GET({ request }) {
   const token = auth.split(" ")[1];
   const hash = createHash("sha256").update(token).digest();
 
-  const [ns] = await db.select()
+  const [ns] = await db
+    .select()
     .from(nameservers)
     .where(eq(nameservers.auth_token_hash, hash))
     .execute();
@@ -63,7 +73,7 @@ export async function GET({ request }) {
         controller.close();
 
         console.log(`Nameserver ${ns.hostname} disconnected`);
-      }
+      };
 
       request.signal.addEventListener("abort", () => {
         console.log("Request aborted by client");
@@ -74,7 +84,7 @@ export async function GET({ request }) {
     cancel() {
       console.log("Stream cancelled by client");
       this.cleanup?.();
-    }
+    },
   });
 
   return new Response(stream, {
@@ -99,23 +109,26 @@ export async function sendZoneDeletion(zoneName: string, pool: string) {
 export async function sendZoneUpdate(zoneId: string) {
   console.log(`Sending zone update for zone ${zoneId}`);
 
-  const [zoneData] = await db.select({
-    name: zones.name,
-    serial: zones.serial,
-    nsPool: zones.nsPool,
-  })
+  const [zoneData] = await db
+    .select({
+      name: zones.name,
+      serial: zones.serial,
+      nsPool: zones.nsPool,
+    })
     .from(zones)
     .where(eq(zones.id, zoneId))
     .execute();
 
-  const ns = await db.select({
-    hostname: nameservers.hostname,
-  })
+  const ns = await db
+    .select({
+      hostname: nameservers.hostname,
+    })
     .from(nameservers)
     .where(eq(nameservers.pool, zoneData.nsPool))
     .execute();
 
-  const zoneRecords = await db.select()
+  const zoneRecords = await db
+    .select()
     .from(records)
     .where(eq(records.zoneId, zoneId))
     .execute();
@@ -134,7 +147,7 @@ export async function sendZoneUpdate(zoneId: string) {
       name: r.name,
       type: r.type,
       data: r.data,
-      ttl: 300
+      ttl: 300,
     });
   }
 
@@ -143,12 +156,14 @@ export async function sendZoneUpdate(zoneId: string) {
     serial: zoneData.serial,
     records: recordMap,
     ns: ns.map((n) => n.hostname),
-  }
+  };
 
   const poolStreams = streams.get(zoneData.nsPool);
 
   console.log(streams);
-  console.log(`Found ${poolStreams?.size ?? 0} stream(s) for pool ${zoneData.nsPool}`);
+  console.log(
+    `Found ${poolStreams?.size ?? 0} stream(s) for pool ${zoneData.nsPool}`,
+  );
 
   if (poolStreams) {
     for (const send of poolStreams) {

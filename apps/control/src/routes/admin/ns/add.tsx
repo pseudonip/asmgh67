@@ -99,7 +99,7 @@ export default function AddNs() {
                 <p class="font-medium">
                   Nameserver added! Authentication token:
                 </p>
-                <code class="block overflow-x-auto text-sm bg-ctp-mantle border rounded-md p-1 mt-1">
+                <code class="block overflow-x-auto text-sm bg-ctp-mantle border rounded-lg p-1 mt-1">
                   {token()}
                 </code>
               </div>

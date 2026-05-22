@@ -5,9 +5,9 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     ssr: {
-      noExternal: ["lucide-solid"]
-    }
+      noExternal: ["lucide-solid"],
+    },
   },
   middleware: "./src/middleware.ts",
-  ssr: true
+  ssr: true,
 });

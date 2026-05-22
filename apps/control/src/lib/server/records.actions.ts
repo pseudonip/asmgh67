@@ -2,10 +2,7 @@
 
 import { getUser } from "./auth.actions";
 
-import {
-  createRecordForUser,
-  getRecordsForUser,
-} from "./records.server";
+import { createRecordForUser, getRecordsForUser } from "./records.server";
 
 import { Record } from "./db/schema";
 import { RecordData, validateRecordData } from "@raincloud/types/records";
@@ -34,18 +31,10 @@ export async function createRecord(
 
   const user = await requireUser();
 
-  return await createRecordForUser(
-    user.id,
-    zoneId,
-    name,
-    type,
-    data,
-  );
+  return await createRecordForUser(user.id, zoneId, name, type, data);
 }
 
-export async function getZoneRecords(
-  zoneId: string,
-): Promise<Record[]> {
+export async function getZoneRecords(zoneId: string): Promise<Record[]> {
   const user = await requireUser();
 
   return await getRecordsForUser(user.id, zoneId);

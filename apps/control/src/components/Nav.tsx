@@ -11,6 +11,7 @@ import {
 
 interface NavProps {
   isCollapsed: boolean;
+
   links: {
     title: string;
     label?: string;

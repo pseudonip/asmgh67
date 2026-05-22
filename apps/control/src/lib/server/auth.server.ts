@@ -3,7 +3,9 @@ import { createHash } from "crypto";
 import { db } from "./db";
 import { sessions, User, users } from "./db/schema";
 
-export async function getUserFromToken(token: string): Promise<Omit<User, "passwordHash"> | null> {
+export async function getUserFromToken(
+  token: string,
+): Promise<Omit<User, "passwordHash"> | null> {
   const sha256 = createHash("sha256").update(token).digest();
 
   const [session] = await db

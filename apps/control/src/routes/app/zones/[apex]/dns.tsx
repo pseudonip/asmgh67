@@ -24,7 +24,12 @@ import { Record } from "~/lib/server/db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { Button } from "~/components/ui/button";
 import { createRecord, getZoneRecords } from "~/lib/server/records.actions";
-import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
+import {
+  ColumnDef,
+  createSolidTable,
+  flexRender,
+  getCoreRowModel,
+} from "@tanstack/solid-table";
 
 export const columns: ColumnDef<Omit<Record, "auth_token_hash">>[] = [
   {
@@ -48,36 +53,42 @@ export default function ZoneDNS() {
 
   const table = createSolidTable({
     get data() {
-      return records().map((d) => {
-        let data = "";
+      return (
+        records().map((d) => {
+          let data = "";
 
-        if (d.type == "A") data = d.data?.address;
-        if (d.type == "AAAA") data = d.data?.address;
+          if (d.type == "A") data = d.data?.address;
+          if (d.type == "AAAA") data = d.data?.address;
 
-        if (d.type == "CNAME") data = d.data?.target;
-        if (d.type == "NS") data = d.data?.target;
-        if (d.type == "PTR") data = d.data?.target;
+          if (d.type == "CNAME") data = d.data?.target;
+          if (d.type == "NS") data = d.data?.target;
+          if (d.type == "PTR") data = d.data?.target;
 
-        if (d.type == "TXT") data = d.data?.text;
+          if (d.type == "TXT") data = d.data?.text;
 
-        return { ...d, data }
-      }) || [];
+          return { ...d, data };
+        }) || []
+      );
     },
 
     get columns() {
       return columns;
     },
 
-    getCoreRowModel: getCoreRowModel()
-  })
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   onMount(async () => {
     try {
-      setRecords((await getZoneRecords(zoneData()!.id)).sort((a, b) => a.name.localeCompare(b.name)));
+      setRecords(
+        (await getZoneRecords(zoneData()!.id)).sort((a, b) =>
+          a.name.localeCompare(b.name),
+        ),
+      );
     } catch (e) {
       setError("Failed to load records");
     }
-  })
+  });
 
   const [rName, setRName] = createSignal("");
   const [rType, setRType] = createSignal("A");
@@ -108,7 +119,12 @@ export default function ZoneDNS() {
     setError("");
 
     try {
-      const record = await createRecord(zoneData()!.id, rName(), rType(), rData()!);
+      const record = await createRecord(
+        zoneData()!.id,
+        rName(),
+        rType(),
+        rData()!,
+      );
 
       setRName("");
       setRType("A");
@@ -116,7 +132,9 @@ export default function ZoneDNS() {
 
       setRecords((r) => [...r, record]);
     } catch (e) {
-      setError("Failed to add record: " + (e instanceof Error ? e.message : String(e)));
+      setError(
+        "Failed to add record: " + (e instanceof Error ? e.message : String(e)),
+      );
     }
   }
 
@@ -128,7 +146,11 @@ export default function ZoneDNS() {
         <h2 class="text-lg">Add Record</h2>
 
         <p class="text-muted-foreground text-sm">
-          {rName() ? (rName() == "@" ? zoneData()?.name : `${rName()}.${zoneData()?.name}`) : "[record name]"}{" "}
+          {rName()
+            ? rName() == "@"
+              ? zoneData()?.name
+              : `${rName()}.${zoneData()?.name}`
+            : "[record name]"}{" "}
           will be an {rType()} record pointing to{" "}
           {displayValue()?.length > 0 ? displayValue() : "[target]"}
         </p>
@@ -175,7 +197,9 @@ export default function ZoneDNS() {
             </TextField>
           </Show>
 
-          <Show when={rType() == "CNAME" || rType() == "NS" || rType() == "PTR"}>
+          <Show
+            when={rType() == "CNAME" || rType() == "NS" || rType() == "PTR"}
+          >
             <TextField>
               <TextFieldLabel>Target</TextFieldLabel>
               <TextFieldInput
@@ -198,7 +222,9 @@ export default function ZoneDNS() {
 
         <p class="text-sm text-ctp-red mt-4">{error()}</p>
 
-        <Button class="mt-5 w-full mb-1" variant="outline" onClick={addRecord}>Add Record</Button>
+        <Button class="mt-5 w-full mb-1" variant="outline" onClick={addRecord}>
+          Add Record
+        </Button>
       </div>
 
       <div class="rounded-lg border mt-4 h-full">
