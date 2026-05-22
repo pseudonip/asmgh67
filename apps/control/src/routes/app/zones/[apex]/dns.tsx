@@ -179,7 +179,7 @@ export default function ZoneDNS() {
 
   return (
     <main class="p-4 flex flex-col h-screen">
-      <h1 class="text-2xl ml-1 leading-none">Manage DNS</h1>
+      <h1 class="text-2xl ml-1 leading-none font-semibold">Manage DNS</h1>
 
       <div class="rounded-xl border border-border bg-card p-4 pb-3 px-6 mt-4">
         <div class="flex">

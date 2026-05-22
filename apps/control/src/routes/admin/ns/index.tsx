@@ -50,23 +50,23 @@ export default function AdminNs() {
   return (
     <main class="p-4 flex flex-col h-screen">
       <div class="flex">
-        <h1 class="text-2xl ml-2 leading-none my-auto">Nameservers</h1>
+        <h1 class="text-2xl ml-2 leading-none my-auto font-semibold">Nameservers</h1>
         <Button as={A} href="/admin/ns/add" class="ml-auto btn">
           Add Nameserver
         </Button>
       </div>
 
-      <div class="rounded-lg border mt-4 h-full">
+      <div class="mt-4 overflow-hidden rounded-xl border border-border bg-card">
         <Table>
           <TableHeader>
             <For each={table.getHeaderGroups()}>
               {(headerGroup) => (
-                <tr key={headerGroup.id}>
+                <tr key={headerGroup.id} class="border-b border-border bg-muted/40 text-left text-[12.5px] font-medium uppercase tracking-wider text-muted-foreground">
                   <For each={headerGroup.headers}>
                     {(header) => (
                       <th
                         key={header.id}
-                        class="h-10 px-2 text-left align-middle"
+                        class="h-10 px-4 text-left align-middle"
                       >
                         {header.isPlaceholder
                           ? null
@@ -97,7 +97,7 @@ export default function AdminNs() {
                       {(cell) => (
                         <TableCell
                           key={cell.id}
-                          class="transition-colors group-hover:bg-muted/50"
+                          class="transition-colors group-hover:bg-muted/50 px-4"
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
