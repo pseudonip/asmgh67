@@ -25,9 +25,7 @@ async function verifyZoneOwnership(userId: string, zoneId: string) {
 export async function createRecordForUser(
   userId: string,
   zoneId: string,
-  name: string,
-  type: string,
-  data: RecordData,
+  { name, type, data, ttl }: { name: string; type: string; data: RecordData, ttl: "auto" | "5m" | "1h" | "1d" },
 ) {
   await verifyZoneOwnership(userId, zoneId);
 
@@ -38,6 +36,7 @@ export async function createRecordForUser(
       name,
       type,
       data,
+      ttl,
     })
     .returning()
     .execute();

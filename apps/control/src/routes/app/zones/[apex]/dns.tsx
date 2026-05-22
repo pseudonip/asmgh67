@@ -30,6 +30,7 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table";
+import { Plus } from "lucide-solid";
 
 export const columns: ColumnDef<Omit<Record, "auth_token_hash">>[] = [
   {
@@ -93,6 +94,8 @@ export default function ZoneDNS() {
   const [rName, setRName] = createSignal("");
   const [rType, setRType] = createSignal("A");
   const [rData, setRData] = createSignal<RecordData>();
+  const [rTTL, setRTTL] = createSignal<"auto" | "5m" | "1h" | "1d">("auto");
+
   const [error, setError] = createSignal<string>("");
 
   const displayValue = () => {
@@ -121,14 +124,18 @@ export default function ZoneDNS() {
     try {
       const record = await createRecord(
         zoneData()!.id,
-        rName(),
-        rType(),
-        rData()!,
+        {
+          name: rName(),
+          type: rType(),
+          data: rData()!,
+          ttl: rTTL(),
+        }
       );
 
       setRName("");
       setRType("A");
       setRData(undefined);
+      setRTTL("auto");
 
       setRecords((r) => [...r, record]);
     } catch (e) {
@@ -142,22 +149,24 @@ export default function ZoneDNS() {
     <main class="p-4 flex flex-col h-screen">
       <h1 class="text-2xl ml-1 leading-none">Manage DNS</h1>
 
-      <div class="rounded-lg border mt-4 p-2 px-3">
-        <h2 class="text-lg">Add Record</h2>
+      <div class="rounded-xl border border-border bg-card p-4.5 mt-4">
+        <div class="flex">
+          <h2 class="text-lg">Add Record</h2>
 
-        <p class="text-muted-foreground text-sm">
-          {rName()
-            ? rName() == "@"
-              ? zoneData()?.name
-              : `${rName()}.${zoneData()?.name}`
-            : "[record name]"}{" "}
-          will be an {rType()} record pointing to{" "}
-          {displayValue()?.length > 0 ? displayValue() : "[target]"}
-        </p>
+          <div class="text-muted-foreground text-sm ml-auto my-auto">
+            {rName()
+              ? rName() == "@"
+                ? zoneData()?.name
+                : `${rName()}.${zoneData()?.name}`
+              : "[record name]"}{" "}
+            will be an {rType()} record pointing to{" "}
+            {displayValue()?.length > 0 ? displayValue() : "[target]"}
+          </div>
+        </div>
 
-        <div class="flex w-full gap-4 mt-4">
-          <div>
-            <p class="text-sm leading-none">Record type</p>
+        <div class="flex w-full gap-4 mt-2">
+          <div class="w-1/10">
+              <p class="text-sm leading-none">Type</p>
 
             <Select
               value={rType()}
@@ -179,52 +188,87 @@ export default function ZoneDNS() {
             </Select>
           </div>
 
-          <TextField>
+          <TextField class="w-1/5">
             <TextFieldLabel>Record name</TextFieldLabel>
             <TextFieldInput
               value={rName()}
               onInput={(e) => setRName(e.currentTarget.value)}
+              class="font-mono! lowercase"
+              placeholder="@ or subdomain"
             />
           </TextField>
 
-          <Show when={rType() == "A" || rType() == "AAAA"}>
-            <TextField>
-              <TextFieldLabel>IPv{rType() == "A" ? "4" : "6"}</TextFieldLabel>
-              <TextFieldInput
-                value={rData()?.address}
-                onInput={(e) => setRData({ address: e.currentTarget.value })}
-              />
-            </TextField>
-          </Show>
+          <div class="w-full">
+            <Show when={rType() == "A" || rType() == "AAAA"}>
+              <TextField>
+                <TextFieldLabel>IPv{rType() == "A" ? "4" : "6"}</TextFieldLabel>
+                <TextFieldInput
+                  value={rData()?.address}
+                  onInput={(e) => setRData({ address: e.currentTarget.value })}
+                  class="font-mono! lowercase"
+                />
+              </TextField>
+            </Show>
 
-          <Show
-            when={rType() == "CNAME" || rType() == "NS" || rType() == "PTR"}
-          >
-            <TextField>
-              <TextFieldLabel>Target</TextFieldLabel>
-              <TextFieldInput
-                value={rData()?.target}
-                onInput={(e) => setRData({ target: e.currentTarget.value })}
-              />
-            </TextField>
-          </Show>
+            <Show
+              when={rType() == "CNAME" || rType() == "NS" || rType() == "PTR"}
+            >
+              <TextField>
+                <TextFieldLabel>Target</TextFieldLabel>
+                <TextFieldInput
+                  value={rData()?.target}
+                  onInput={(e) => setRData({ target: e.currentTarget.value })}
+                  class="font-mono! lowercase"
+                />
+              </TextField>
+            </Show>
 
-          <Show when={rType() == "TXT"}>
-            <TextField>
-              <TextFieldLabel>Text</TextFieldLabel>
-              <TextFieldInput
-                value={rData()?.text}
-                onInput={(e) => setRData({ text: e.currentTarget.value })}
-              />
-            </TextField>
-          </Show>
+            <Show when={rType() == "TXT"}>
+              <TextField>
+                <TextFieldLabel>Text</TextFieldLabel>
+                <TextFieldInput
+                  value={rData()?.text}
+                  onInput={(e) => setRData({ text: e.currentTarget.value })}
+                  class="font-mono! lowercase"
+                />
+              </TextField>
+            </Show>
+          </div>
+
+          <div class="w-1/5">
+            <p class="text-sm leading-none">TTL</p>
+
+            <Select
+              value={rTTL()}
+              onChange={setRTTL}
+              options={["auto", "5m", "1h", "1d"]}
+              class="mt-1"
+              itemComponent={(itemProps) => (
+                <SelectItem item={itemProps.item}>
+                  {itemProps.item.rawValue == "auto"
+                    ? "Automatic"
+                    : itemProps.item.rawValue}
+                </SelectItem>
+              )}
+            >
+              <SelectTrigger aria-label="Record TTL">
+                <SelectValue<string>>
+                  {(state) =>
+                    state.selectedOption()
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent />
+            </Select>
+          </div>
+
+          <Button class="mt-auto" onClick={addRecord}>
+            <Plus size={16} />
+            Add Record
+          </Button>
         </div>
 
-        <p class="text-sm text-ctp-red mt-4">{error()}</p>
-
-        <Button class="mt-5 w-full mb-1" variant="outline" onClick={addRecord}>
-          Add Record
-        </Button>
+        <p class="text-sm text-ctp-red mt-2">{error()}</p>
       </div>
 
       <div class="rounded-lg border mt-4 h-full">

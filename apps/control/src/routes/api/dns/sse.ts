@@ -143,11 +143,30 @@ export async function sendZoneUpdate(zoneId: string) {
       recordMap[key] = [];
     }
 
+    let ttl: number;
+
+    switch (r.ttl) {
+      case "auto":
+        ttl = 3600;
+        break;
+      case "5m":
+        ttl = 300;
+        break;
+      case "1h":
+        ttl = 3600;
+        break;
+      case "1d":
+        ttl = 86400;
+        break;
+      default:
+        ttl = 3600;
+    }
+
     recordMap[key].push({
       name: r.name,
       type: r.type,
       data: r.data,
-      ttl: 300,
+      ttl,
     });
   }
 

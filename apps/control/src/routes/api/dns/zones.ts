@@ -39,6 +39,7 @@ export async function GET({ request }) {
       recordName: records.name,
       recordType: records.type,
       recordData: records.data,
+      rowTTL: records.ttl,
     })
     .from(zones)
     .leftJoin(records, eq(records.zoneId, zones.id))
@@ -69,11 +70,30 @@ export async function GET({ request }) {
         : `${row.recordName}.${row.zoneName}`;
     const key = `${fqdn}:${row.recordType}`;
 
+    let ttl: number;
+
+    switch (row.rowTTL) {
+      case "auto":
+        ttl = 3600;
+        break;
+      case "5m":
+        ttl = 300;
+        break;
+      case "1h":
+        ttl = 3600;
+        break;
+      case "1d":
+        ttl = 86400;
+        break;
+      default:
+        ttl = 3600;
+    }
+
     (z.records[key] ??= []).push({
       name: fqdn,
       type: row.recordType,
       data: row.recordData,
-      ttl: 300,
+      ttl,
     });
   }
 

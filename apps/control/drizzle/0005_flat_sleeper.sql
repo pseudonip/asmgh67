@@ -1,0 +1,1 @@
+ALTER TABLE "records" ADD COLUMN "ttl" text DEFAULT 'auto' NOT NULL;

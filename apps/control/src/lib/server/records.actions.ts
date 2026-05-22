@@ -19,9 +19,7 @@ async function requireUser() {
 
 export async function createRecord(
   zoneId: string,
-  name: string,
-  type: string,
-  data: RecordData,
+  { name, type, data, ttl }: { name: string; type: string; data: RecordData; ttl: "auto" | "5m" | "1h" | "1d" },
 ) {
   const result = validateRecordData(type, data);
 
@@ -31,7 +29,7 @@ export async function createRecord(
 
   const user = await requireUser();
 
-  return await createRecordForUser(user.id, zoneId, name, type, data);
+  return await createRecordForUser(user.id, zoneId, { name, type, data, ttl });
 }
 
 export async function getZoneRecords(zoneId: string): Promise<Record[]> {

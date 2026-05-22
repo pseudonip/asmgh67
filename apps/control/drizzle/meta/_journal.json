@@ -36,6 +36,13 @@
       "when": 1779129677258,
       "tag": "0004_smart_alice",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779461226714,
+      "tag": "0005_flat_sleeper",
+      "breakpoints": true
     }
   ]
 }
