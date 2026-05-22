@@ -13,7 +13,10 @@ export default function AdminLayout(props: { children: Node }) {
   return (
     <div class="h-screen flex">
       <Show when={location.pathname != "/app/zones/new"}>
-        <Sidebar domains={zones()?.map((z) => z.name) ?? []} zone={location.pathname.split("/")[3]} />
+        <Sidebar
+          domains={zones()?.map((z) => z.name) ?? []}
+          zone={location.pathname.split("/")[3]}
+        />
       </Show>
 
       <main class="flex-1 overflow-auto">{props.children}</main>

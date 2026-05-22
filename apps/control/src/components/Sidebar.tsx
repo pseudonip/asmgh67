@@ -60,7 +60,12 @@ export default function Sidebar(props: SidebarProps) {
         collapsed() ? "w-14" : "w-60",
       )}
     >
-      <div class={cn("flex items-center gap-2 px-2 py-2", collapsed() && "justify-center px-0")}>
+      <div
+        class={cn(
+          "flex items-center gap-2 px-2 py-2",
+          collapsed() && "justify-center px-0",
+        )}
+      >
         <Show when={!collapsed()}>
           <p class="text-[15px] font-semibold tracking-light">Raincloud</p>
         </Show>
@@ -70,14 +75,27 @@ export default function Sidebar(props: SidebarProps) {
         <DomainSwitcher domains={props.domains} isCollapsed={collapsed()} />
       </Show>
 
-      <div class={cn("px-2 pt-3 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground", collapsed() && "sr-only")}>
+      <div
+        class={cn(
+          "px-2 pt-3 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground",
+          collapsed() && "sr-only",
+        )}
+      >
         {props.admin ? "Admin" : "Workspace"}
       </div>
 
-      <Nav isCollapsed={collapsed()} links={props.admin ? adminLinks() : workspaceLinks()} />
+      <Nav
+        isCollapsed={collapsed()}
+        links={props.admin ? adminLinks() : workspaceLinks()}
+      />
 
       <Show when={props.zone}>
-        <div class={cn("px-2 pt-3 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground truncate", collapsed() && "sr-only")}>
+        <div
+          class={cn(
+            "px-2 pt-2 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground truncate",
+            collapsed() && "sr-only",
+          )}
+        >
           {props.zone}
         </div>
 
