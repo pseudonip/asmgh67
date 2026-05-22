@@ -32,6 +32,8 @@ export async function GET({ request }) {
 
   const stream = new ReadableStream({
     start(controller) {
+      controller.enqueue(encoder.encode(": connected\n\n"));
+
       const send: Send = (event, data) => {
         let payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
         controller.enqueue(encoder.encode(payload));
@@ -106,11 +108,14 @@ export async function sendZoneUpdate(zoneId: string) {
   const recordMap: Record<string, SerializedRecord[]> = {};
 
   for (const r of zoneRecords) {
-    if (!recordMap[r.name]) {
-      recordMap[r.name] = [];
+    const fqdn = r.name === "@" ? zoneData.name : `${r.name}.${zoneData.name}`;
+    const key = `${fqdn}:${r.type}`;
+
+    if (!recordMap[key]) {
+      recordMap[key] = [];
     }
 
-    recordMap[r.name].push({
+    recordMap[key].push({
       name: r.name,
       type: r.type,
       data: r.data,

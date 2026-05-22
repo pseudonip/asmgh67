@@ -1,5 +1,6 @@
 import dnsPacket from "dns-packet";
 import "dotenv/config";
+import { ServerEventName } from "@raincloud/types/sse";
 import handle from "./handle";
 import { State } from "./state";
 
@@ -45,3 +46,75 @@ await Bun.udpSocket({
 });
 
 console.log(`DNS server is running on port ${PORT}`);
+
+let wait = 1000;
+
+while (true) {
+  try {
+    const controller = new AbortController();
+
+    console.log("Connecting to control server SSE stream...");
+
+    const res = await fetch(`${process.env.CONTROL_SERVER}/api/dns/sse`, {
+      headers: {
+        Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
+      },
+      signal: controller.signal,
+    });
+
+    if (!res.ok || !res.body) {
+      throw new Error(`Failed to connect to control server: ${res.statusText}`);
+    }
+
+    wait = 1000;
+    console.log("Connected to control server SSE stream");
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        let idx;
+        while ((idx = buffer.indexOf("\n\n")) !== -1) {
+          const frame = buffer.slice(0, idx).trim();
+          buffer = buffer.slice(idx + 2);
+
+          if (frame.startsWith(":")) continue;
+
+          let event: ServerEventName | undefined;
+          let data = "";
+
+          for (const line of frame.split("\n")) {
+            if (line.startsWith("event:")) event = line.slice(6).trim() as ServerEventName;
+            else if (line.startsWith("data:")) data += line.slice(5).trim();
+          }
+
+          if (event === "updateZone") {
+            try {
+              const zone = JSON.parse(data);
+              console.log("Received zone update from control server:", zone);
+              state.set(zone);
+            } catch (err) {
+              console.error("Failed to parse zone update data:", err);
+            }
+          }
+        }
+      }
+    } finally {
+      controller.abort();
+      reader.releaseLock();
+      console.log("Disconnected from control server SSE stream");
+    }
+  } catch (err) {
+    console.error("connection lost: ", err);
+  }
+
+  await Bun.sleep(wait);
+  wait = Math.min(wait * 2, 10000);
+}
