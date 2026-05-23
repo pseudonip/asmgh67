@@ -16,7 +16,7 @@ type Send = <E extends ServerEventName>(
 const streams: Map<string, Set<Send>> = ((globalThis as any).__sseStreams ??=
   new Map());
 
-export async function GET({ request }) {
+export async function GET({ request, nativeEvent }) {
   const auth = request.headers.get("Authorization");
 
   if (!auth || !auth.startsWith("Bearer ")) {
@@ -62,11 +62,10 @@ export async function GET({ request }) {
           controller.enqueue(encoder.encode(": ping\n\n"));
         } catch (e) {
           console.error("Error sending heartbeat:", e);
-          this.cleanup?.();
         }
       }, 30000); // every 30sec
 
-      this.cleanup = () => {
+      const cleanup = () => {
         streams.get(ns.pool)!.delete(send);
 
         clearInterval(heartbeat);
@@ -75,15 +74,8 @@ export async function GET({ request }) {
         console.log(`Nameserver ${ns.hostname} disconnected`);
       };
 
-      request.signal.addEventListener("abort", () => {
-        console.log("Request aborted by client");
-        this.cleanup?.();
-      });
-    },
-
-    cancel() {
-      console.log("Stream cancelled by client");
-      this.cleanup?.();
+      nativeEvent.node.res.on("close", cleanup);
+      request.signal.addEventListener("abort", cleanup);
     },
   });
 
