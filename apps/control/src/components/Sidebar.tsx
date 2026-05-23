@@ -14,7 +14,7 @@ interface SidebarProps {
   admin?: boolean;
 }
 
-async function getLocalsUser(): Promise<{ displayName: string; email: string } | undefined> {
+async function getLocalsUser(): Promise<{ displayName: string; email: string; isAdmin: boolean } | undefined> {
   "use server";
   const event = getRequestEvent();
 
@@ -22,13 +22,13 @@ async function getLocalsUser(): Promise<{ displayName: string; email: string } |
     const user = await getUser();
 
     if (user) {
-      return { displayName: user.displayName, email: user.email };
+      return { displayName: user.displayName, email: user.email, isAdmin: user.isAdmin };
     } else {
       return undefined;
     }
   }
 
-  return {  displayName: event?.locals.user?.displayName, email: event?.locals.user?.email}
+  return { displayName: event?.locals.user?.displayName, email: event?.locals.user?.email, isAdmin: event?.locals.user?.isAdmin };
 }
 
 export default function Sidebar(props: SidebarProps) {
@@ -103,6 +103,18 @@ export default function Sidebar(props: SidebarProps) {
       >
         <Show when={!collapsed()}>
           <p class="text-[15px] font-semibold tracking-light">Raincloud</p>
+
+          <Show when={user()?.isAdmin && !props.admin} fallback={
+            <a href="/app" class="text-xs ml-auto text-muted-foreground! flex leading-none">
+              app
+              <ChevronsRight size={12} class="ml-1 mt-[0.5px]" />
+            </a>
+          }>
+            <a href="/admin" class="text-xs ml-auto text-muted-foreground! flex leading-none">
+              admin
+              <ChevronsRight size={12} class="ml-1 mt-[0.5px]" />
+            </a>
+          </Show>
         </Show>
       </div>
 
