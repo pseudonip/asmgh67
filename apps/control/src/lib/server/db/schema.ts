@@ -71,7 +71,9 @@ export const records = pgTable("records", {
   name: text("name").notNull(),
   type: text("type").notNull(),
   data: jsonb("data").$type<RecordData>().notNull(),
-  ttl: text("ttl", { enum: ["auto", "5m", "1h", "1d"] }).notNull().default("auto"),
+  ttl: text("ttl", { enum: ["auto", "5m", "1h", "1d"] })
+    .notNull()
+    .default("auto"),
 });
 
 export type User = typeof users.$inferSelect;

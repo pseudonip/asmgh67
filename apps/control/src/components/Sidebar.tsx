@@ -54,7 +54,7 @@ export default function Sidebar(props: SidebarProps) {
       url: "/admin/ns",
       icon: Server,
       variant: variant((p) => p === "/admin/ns"),
-    }
+    },
   ];
 
   return (

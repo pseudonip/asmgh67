@@ -4,7 +4,10 @@ import { Record, records, Zone, zones } from "./db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
-async function verifyZoneOwnership(userId: string, zoneId: string): Promise<Zone> {
+async function verifyZoneOwnership(
+  userId: string,
+  zoneId: string,
+): Promise<Zone> {
   const [zone] = await db
     .select()
     .from(zones)
@@ -25,7 +28,17 @@ async function verifyZoneOwnership(userId: string, zoneId: string): Promise<Zone
 export async function createRecordForUser(
   userId: string,
   zoneId: string,
-  { name, type, data, ttl }: { name: string; type: string; data: RecordData, ttl: "auto" | "5m" | "1h" | "1d" },
+  {
+    name,
+    type,
+    data,
+    ttl,
+  }: {
+    name: string;
+    type: string;
+    data: RecordData;
+    ttl: "auto" | "5m" | "1h" | "1d";
+  },
 ) {
   await verifyZoneOwnership(userId, zoneId);
 
@@ -72,10 +85,7 @@ export async function deleteRecordForUser(userId: string, recordId: string) {
 
   const zone = await verifyZoneOwnership(userId, record.zoneId);
 
-  await db
-    .delete(records)
-    .where(eq(records.id, recordId))
-    .execute();
+  await db.delete(records).where(eq(records.id, recordId)).execute();
 
   await sendZoneUpdate(zone.id);
 }

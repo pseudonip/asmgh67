@@ -2,7 +2,11 @@
 
 import { getUser } from "./auth.actions";
 
-import { createRecordForUser, getRecordsForUser, deleteRecordForUser } from "./records.server";
+import {
+  createRecordForUser,
+  getRecordsForUser,
+  deleteRecordForUser,
+} from "./records.server";
 
 import { Record } from "./db/schema";
 import { RecordData, validateRecordData } from "@raincloud/types/records";
@@ -19,7 +23,17 @@ async function requireUser() {
 
 export async function createRecord(
   zoneId: string,
-  { name, type, data, ttl }: { name: string; type: string; data: RecordData; ttl: "auto" | "5m" | "1h" | "1d" },
+  {
+    name,
+    type,
+    data,
+    ttl,
+  }: {
+    name: string;
+    type: string;
+    data: RecordData;
+    ttl: "auto" | "5m" | "1h" | "1d";
+  },
 ) {
   const result = validateRecordData(type, data);
 

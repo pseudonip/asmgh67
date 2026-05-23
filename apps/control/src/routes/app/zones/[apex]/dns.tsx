@@ -1,12 +1,4 @@
-import { useNavigate } from "@solidjs/router";
 import { useZone } from "./context";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -19,18 +11,18 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { Record } from "~/lib/server/db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { Button } from "~/components/ui/button";
-import { createRecord, deleteRecord, getZoneRecords } from "~/lib/server/records.actions";
 import {
-  ColumnDef,
-  createSolidTable,
-  flexRender,
-  getCoreRowModel,
-} from "@tanstack/solid-table";
+  createRecord,
+  deleteRecord,
+  getZoneRecords,
+} from "~/lib/server/records.actions";
+import { ColumnDef } from "@tanstack/solid-table";
 import { Plus, Trash } from "lucide-solid";
+import Table from "~/components/Table";
 
 export const columns: ColumnDef<Record>[] = [
   {
@@ -57,20 +49,23 @@ export const columns: ColumnDef<Record>[] = [
 
       return (
         <div class="flex gap-2 justify-end">
-          <button onClick={async () => {
-            try {
-              await deleteRecord(record.id);
-              info.table.options.meta?.deleteRecord(record.id);
-            } catch (e) {
-              console.error("Failed to delete record:", e);
-            }
-          }} class="hover:text-ctp-red transition-all duration-300">
+          <button
+            onClick={async () => {
+              try {
+                await deleteRecord(record.id);
+                info.table.options.meta?.deleteRecord(record.id);
+              } catch (e) {
+                console.error("Failed to delete record:", e);
+              }
+            }}
+            class="hover:text-ctp-red transition-all duration-300"
+          >
             <Trash size={16} />
           </button>
         </div>
       );
-    }
-  }
+    },
+  },
 ];
 
 export default function ZoneDNS() {
@@ -78,38 +73,27 @@ export default function ZoneDNS() {
 
   const [records, setRecords] = createSignal<Record[]>([]);
 
-  const table = createSolidTable({
-    get data() {
-      return (
-        records().map((d) => {
-          let data = "";
+  const data = () =>
+    records().map((d) => {
+      let data = "";
 
-          if (d.type == "A") data = d.data?.address;
-          if (d.type == "AAAA") data = d.data?.address;
+      if (d.type == "A") data = d.data?.address;
+      if (d.type == "AAAA") data = d.data?.address;
 
-          if (d.type == "CNAME") data = d.data?.target;
-          if (d.type == "NS") data = d.data?.target;
-          if (d.type == "PTR") data = d.data?.target;
+      if (d.type == "CNAME") data = d.data?.target;
+      if (d.type == "NS") data = d.data?.target;
+      if (d.type == "PTR") data = d.data?.target;
 
-          if (d.type == "TXT") data = d.data?.text;
+      if (d.type == "TXT") data = d.data?.text;
 
-          return { ...d, data };
-        }) || []
-      );
+      return { ...d, data };
+    }) || [];
+
+  const meta = {
+    deleteRecord: (id: string) => {
+      setRecords((recs) => recs.filter((r) => r.id !== id));
     },
-
-    get columns() {
-      return columns;
-    },
-
-    getCoreRowModel: getCoreRowModel(),
-
-    meta: {
-      deleteRecord: (id: string) => {
-        setRecords((recs) => recs.filter((r) => r.id !== id));
-      }
-    }
-  });
+  };
 
   onMount(async () => {
     try {
@@ -154,15 +138,12 @@ export default function ZoneDNS() {
     setError("");
 
     try {
-      const record = await createRecord(
-        zoneData()!.id,
-        {
-          name: rName(),
-          type: rType(),
-          data: rData()!,
-          ttl: rTTL(),
-        }
-      );
+      const record = await createRecord(zoneData()!.id, {
+        name: rName(),
+        type: rType(),
+        data: rData()!,
+        ttl: rTTL(),
+      });
 
       setRName("");
       setRType("A");
@@ -181,7 +162,7 @@ export default function ZoneDNS() {
     <main class="p-4 flex flex-col h-screen">
       <h1 class="text-2xl ml-1 leading-none font-semibold">Manage DNS</h1>
 
-      <div class="rounded-xl border border-border bg-card p-4 pb-3 px-6 mt-4">
+      <div class="rounded-xl border border-border bg-card p-4 px-6 mt-4">
         <div class="flex">
           <h2 class="text-lg">Add Record</h2>
 
@@ -198,7 +179,7 @@ export default function ZoneDNS() {
 
         <div class="flex w-full gap-4 mt-2">
           <div class="w-1/10">
-              <p class="text-sm leading-none">Type</p>
+            <p class="text-sm leading-none">Type</p>
 
             <Select
               value={rType()}
@@ -285,9 +266,7 @@ export default function ZoneDNS() {
             >
               <SelectTrigger aria-label="Record TTL">
                 <SelectValue<string>>
-                  {(state) =>
-                    state.selectedOption()
-                  }
+                  {(state) => state.selectedOption()}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent />
@@ -303,63 +282,12 @@ export default function ZoneDNS() {
         <p class="text-sm text-ctp-red mt-2">{error()}</p>
       </div>
 
-      <div class="mt-4 overflow-hidden rounded-xl border border-border bg-card">
-        <Table>
-          <TableHeader>
-            <For each={table.getHeaderGroups()}>
-              {(headerGroup) => (
-                <tr key={headerGroup.id} class="border-b border-border bg-muted/40 text-left text-[12.5px] font-medium uppercase tracking-wider text-muted-foreground">
-                  <For each={headerGroup.headers}>
-                    {(header) => (
-                      <th
-                        key={header.id}
-                        class="h-10 px-4 text-left align-middle"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : header.column.columnDef.header}
-                      </th>
-                    )}
-                  </For>
-                </tr>
-              )}
-            </For>
-          </TableHeader>
-
-          <TableBody>
-            <Show
-              when={table.getRowModel().rows?.length}
-              fallback={
-                <TableRow>
-                  <TableCell colSpan={columns.length} class="h-24 text-center">
-                    No records found.
-                  </TableCell>
-                </TableRow>
-              }
-            >
-              <For each={table.getRowModel().rows}>
-                {(row) => (
-                  <TableRow key={row.id} class="group">
-                    <For each={row.getVisibleCells()}>
-                      {(cell) => (
-                        <TableCell
-                          key={cell.id}
-                          class="transition-colors group-hover:bg-muted/50 px-4"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      )}
-                    </For>
-                  </TableRow>
-                )}
-              </For>
-            </Show>
-          </TableBody>
-        </Table>
-      </div>
+      <Table
+        columns={columns}
+        data={data()}
+        noEntriesMessage="No records found"
+        meta={meta}
+      />
     </main>
   );
 }
