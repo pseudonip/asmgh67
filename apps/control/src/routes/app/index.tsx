@@ -48,11 +48,11 @@ export default function App() {
 
   return (
     <main class="p-4 flex flex-col h-screen">
-      <div class="flex">
+      <div class="flex mb-4">
         <div>
           <h1 class="text-2xl ml-1 leading-none font-semibold">Zones</h1>
           <p class="text-sm text-muted-foreground ml-1 mt-1">
-            Domains you have delegated to Raincloud.
+            Domains you have delegated to Raincloud
           </p>
         </div>
 

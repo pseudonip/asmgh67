@@ -15,7 +15,7 @@ export default function AppLayout(props: { children: Node }) {
       <Show when={location.pathname != "/app/zones/new"}>
         <Sidebar
           domains={zones()?.map((z) => z.name) ?? []}
-          zone={location.pathname.split("/")[3]}
+          zone={location.pathname.startsWith("/app/zones/") && location.pathname.split("/")[3]}
         />
       </Show>
 

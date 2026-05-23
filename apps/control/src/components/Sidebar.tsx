@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "@solidjs/router";
-import { ChevronsLeft, ChevronsRight, Globe, Home, List, LogOut, Server } from "lucide-solid";
+import { ChevronsLeft, ChevronsRight, Globe, Home, List, LogOut, Server, Settings } from "lucide-solid";
 import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
 import DomainSwitcher from "./DomainSwitcher";
@@ -49,6 +49,12 @@ export default function Sidebar(props: SidebarProps) {
       icon: Globe,
       variant: variant((path) => path === "/app"),
     },
+    {
+      title: "Settings",
+      url: "/app/settings",
+      icon: Settings,
+      variant: variant((p) => p.startsWith("/app/settings")),
+    }
   ];
 
   const zoneLinks = (domain: string) => [
@@ -98,7 +104,7 @@ export default function Sidebar(props: SidebarProps) {
       <div
         class={cn(
           "flex items-center gap-2 px-2 py-2",
-          collapsed() ? "justify-center px-0" : "mb-2.5",
+          collapsed() ? "justify-center px-0" : "mb-2",
         )}
       >
         <Show when={!collapsed()}>

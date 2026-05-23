@@ -50,6 +50,20 @@
       "when": 1779535366738,
       "tag": "0006_petite_mercury",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1779561968880,
+      "tag": "0007_grey_magdalene",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1779564901730,
+      "tag": "0008_known_ares",
+      "breakpoints": true
     }
   ]
 }

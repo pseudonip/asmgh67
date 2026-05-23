@@ -155,7 +155,7 @@ export default function ZoneDNS() {
     <main class="p-4 flex flex-col h-screen">
       <h1 class="text-2xl ml-1 leading-none font-semibold">Manage DNS</h1>
 
-      <div class="rounded-xl border border-border bg-card p-4 px-6 mt-4">
+      <div class="rounded-xl border border-border bg-card p-4 px-6 my-4">
         <div class="flex">
           <h2 class="text-lg">Add Record</h2>
 

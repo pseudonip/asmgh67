@@ -27,7 +27,7 @@ export default function AdminNs() {
 
   return (
     <main class="p-4 flex flex-col h-screen">
-      <div class="flex">
+      <div class="flex mb-4">
         <h1 class="text-2xl ml-2 leading-none my-auto font-semibold">
           Nameservers
         </h1>

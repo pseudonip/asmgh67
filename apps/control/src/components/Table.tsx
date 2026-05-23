@@ -36,7 +36,7 @@ export default function Table(props: TableProps) {
   });
 
   return (
-    <div class="mt-4 overflow-hidden rounded-xl border border-border bg-card">
+    <div class="overflow-hidden rounded-xl border border-border bg-card">
       <SolidTable>
         <TableHeader>
           <For each={table.getHeaderGroups()}>

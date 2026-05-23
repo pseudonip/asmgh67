@@ -20,7 +20,6 @@ export async function createNameserver(
   pool: string,
 ): Promise<string> {
   const token = "rcns_" + randomBytes(32).toString("hex");
-
   const hash = createHash("sha256").update(token).digest();
 
   await db
