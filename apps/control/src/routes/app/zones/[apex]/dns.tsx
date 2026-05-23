@@ -11,7 +11,7 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createSignal, onMount, Show } from "solid-js";
+import { createResource, createSignal, onMount, Show } from "solid-js";
 import { Record } from "~/lib/server/db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { Button } from "~/components/ui/button";
@@ -71,10 +71,15 @@ export const columns: ColumnDef<Record>[] = [
 export default function ZoneDNS() {
   const zoneData = useZone();
 
-  const [records, setRecords] = createSignal<Record[]>([]);
+  const [records, { mutate: setRecords }] = createResource(
+    () => zoneData()?.id,
+    async (id) => {
+      return (await getZoneRecords(id)).sort((a, b) => a.type.localeCompare(b.type));
+    }
+  );
 
   const data = () =>
-    records().map((d) => {
+    records()?.map((d) => {
       let data = "";
 
       if (d.type == "A") data = d.data?.address;
@@ -91,21 +96,9 @@ export default function ZoneDNS() {
 
   const meta = {
     deleteRecord: (id: string) => {
-      setRecords((recs) => recs.filter((r) => r.id !== id));
+      setRecords((recs) => recs?.filter((r) => r.id !== id));
     },
   };
-
-  onMount(async () => {
-    try {
-      setRecords(
-        (await getZoneRecords(zoneData()!.id)).sort((a, b) =>
-          a.type.localeCompare(b.type),
-        ),
-      );
-    } catch (e) {
-      setError("Failed to load records");
-    }
-  });
 
   const [rName, setRName] = createSignal("");
   const [rType, setRType] = createSignal("A");
@@ -150,7 +143,7 @@ export default function ZoneDNS() {
       setRData(undefined);
       setRTTL("auto");
 
-      setRecords((r) => [...r, record]);
+      setRecords((r) => [...(r ?? []), record]);
     } catch (e) {
       setError(
         "Failed to add record: " + (e instanceof Error ? e.message : String(e)),

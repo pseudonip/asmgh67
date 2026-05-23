@@ -9,5 +9,5 @@ export default function Zone() {
     return navigate("setup");
   }
 
-  return <main class="w-full h-screen flex px-2"></main>;
+  return <main class="w-full h-screen flex px-2">zone overview</main>;
 }

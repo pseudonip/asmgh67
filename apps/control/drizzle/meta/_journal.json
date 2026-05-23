@@ -43,6 +43,13 @@
       "when": 1779461226714,
       "tag": "0005_flat_sleeper",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779535366738,
+      "tag": "0006_petite_mercury",
+      "breakpoints": true
     }
   ]
 }

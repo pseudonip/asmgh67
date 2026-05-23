@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { useZone } from "./context";
 import { getZoneSetupStatus } from "~/lib/server/zones.actions";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Check, X } from "lucide-solid";
+import { Check, CircleDashed, X } from "lucide-solid";
 
 export default function ZoneSetup() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function ZoneSetup() {
 
   const [setupData, setSetupData] = createSignal<any>(null);
 
-  onMount(async () => {
+  createEffect(async () => {
     const status = await getZoneSetupStatus(zoneData()!.name);
 
     if (!status) {
@@ -77,8 +77,8 @@ export default function ZoneSetup() {
             <div class="border rounded-lg">
               <For each={setupData()?.added}>
                 {(ns: string) => (
-                  <div class="px-4 py-2 border-b last:border-0 text-ctp-green flex">
-                    <Check class="inline-block mr-2" />
+                  <div class="px-4 py-2 border-b last:border-0 text-ctp-green flex items-center">
+                    <Check class="inline-block mr-2" size={16} />
                     {ns}
                     <p class="ml-auto text-ctp-text">NS</p>
                   </div>
@@ -87,10 +87,10 @@ export default function ZoneSetup() {
 
               <For each={setupData()?.add}>
                 {(ns: string) => (
-                  <div class="px-4 py-2 border-b last:border-0 text-ctp-red flex">
-                    <X class="inline-block mr-2" />
+                  <div class="px-4 py-2 border-b last:border-0 flex items-center">
+                    <CircleDashed class="inline-block mr-2" size={16} />
                     {ns}
-                    <p class="ml-auto text-ctp-text">NS</p>
+                    <p class="ml-auto">NS</p>
                   </div>
                 )}
               </For>
@@ -104,8 +104,8 @@ export default function ZoneSetup() {
               <div class="border rounded-lg">
                 <For each={setupData()?.remove}>
                   {(ns: string) => (
-                    <div class="px-4 py-2 border-b last:border-0 text-ctp-red flex">
-                      <X class="inline-block mr-2" />
+                    <div class="px-4 py-2 border-b last:border-0 text-ctp-red flex items-center">
+                      <X class="inline-block mr-2" size={16} />
                       {ns}
                       <p class="ml-auto text-ctp-text">NS</p>
                     </div>

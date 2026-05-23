@@ -21,6 +21,7 @@ const bytea = customType<{ data: Buffer; driverData: Buffer }>({
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
+  displayName: text("display_name").notNull().default(""),
   email: citext("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
