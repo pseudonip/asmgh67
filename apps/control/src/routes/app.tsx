@@ -3,7 +3,7 @@ import { useLocation } from "@solidjs/router";
 import { getUserZones } from "~/lib/server/zones.actions";
 import Sidebar from "~/components/Sidebar";
 
-export default function AdminLayout(props: { children: Node }) {
+export default function AppLayout(props: { children: Node }) {
   const location = useLocation();
 
   const [zones] = createResource(async () => {

@@ -19,6 +19,7 @@ import { register as serverRegister } from "~/lib/server/auth.actions";
 export default function Login() {
   const navigate = useNavigate();
 
+  const [displayName, setDisplayName] = createSignal("");
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
   const [confirmPassword, setConfirmPassword] = createSignal("");
@@ -39,7 +40,7 @@ export default function Login() {
     }
 
     try {
-      await serverRegister(email(), password());
+      await serverRegister({ displayName: displayName(), email: email(), password: password() });
       navigate("/app");
     } catch (err) {
       setError(
@@ -55,12 +56,21 @@ export default function Login() {
           <CardHeader class="space-y-1">
             <CardTitle class="text-2xl">Create an account</CardTitle>
             <CardDescription>
-              Enter your email and password to register. Already have an
+              Enter your display name, email and password to register. Already have an
               account? <a href="/login">Log in</a>
             </CardDescription>
           </CardHeader>
 
           <CardContent class="grid gap-4">
+            <TextField class="grid gap-2">
+              <TextFieldLabel>Display Name</TextFieldLabel>
+              <TextFieldInput
+                placeholder="John Doe"
+                value={displayName()}
+                onInput={(e) => setDisplayName(e.currentTarget.value)}
+              />
+            </TextField>
+
             <TextField class="grid gap-2">
               <TextFieldLabel>Email</TextFieldLabel>
               <TextFieldInput

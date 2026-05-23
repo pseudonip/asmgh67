@@ -30,30 +30,7 @@ export default function Nav(props: NavProps) {
       <nav class="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         <For each={props.links}>
           {(link) =>
-            props.isCollapsed ? (
-              <Tooltip placement="right">
-                <TooltipTrigger>
-                  <A
-                    href={link.url}
-                    class={cn(
-                      buttonVariants({ variant: link.variant, size: "icon" }),
-                      "h-9 w-9",
-                    )}
-                  >
-                    <link.icon class="h-4 w-4" />
-                    <span class="sr-only">{link.title}</span>
-                  </A>
-                </TooltipTrigger>
-                <TooltipContent class="flex items-center gap-4">
-                  {link.title}
-                  <Show when={link.label}>
-                    <span class="ml-auto text-muted-foreground">
-                      {link.label}
-                    </span>
-                  </Show>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
+            <Show when={props.isCollapsed} fallback={
               <A
                 href={link.url}
                 class={cn(
@@ -75,7 +52,28 @@ export default function Nav(props: NavProps) {
                   </span>
                 </Show>
               </A>
-            )
+            }>
+              <Tooltip placement="right">
+                <TooltipTrigger>
+                  <A
+                    href={link.url}
+                    class={cn(
+                      buttonVariants({ variant: link.variant, size: "icon" }),
+                      "h-9 w-9 btn",
+                    )}
+                  >
+                    <link.icon class="h-4 w-4" />
+                    <span class="sr-only">{link.title}</span>
+                  </A>
+                </TooltipTrigger>
+                <TooltipContent class="flex items-center gap-4">
+                  {link.title}
+                  <Show when={link.label}>
+                    <span class="ml-auto text-muted-foreground">{link.label}</span>
+                  </Show>
+                </TooltipContent>
+              </Tooltip>
+            </Show>
           }
         </For>
       </nav>

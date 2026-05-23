@@ -1,9 +1,12 @@
-import { useLocation } from "@solidjs/router";
-import { Globe, Home, List, Server } from "lucide-solid";
-import { createSignal, Show } from "solid-js";
+import { useLocation, useNavigate } from "@solidjs/router";
+import { ChevronsLeft, ChevronsRight, Globe, Home, List, LogOut, Server } from "lucide-solid";
+import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
 import DomainSwitcher from "./DomainSwitcher";
 import Nav from "./Nav";
+import { Button } from "./ui/button";
+import { getRequestEvent } from "solid-js/web";
+import { getUser, logout as serverLogout } from "~/lib/server/auth.actions";
 
 interface SidebarProps {
   domains: string[];
@@ -11,8 +14,29 @@ interface SidebarProps {
   admin?: boolean;
 }
 
+async function getLocalsUser(): Promise<{ displayName: string; email: string } | undefined> {
+  "use server";
+  const event = getRequestEvent();
+
+  if (!event?.locals.user) {
+    const user = await getUser();
+
+    if (user) {
+      return { displayName: user.displayName, email: user.email };
+    } else {
+      return undefined;
+    }
+  }
+
+  return {  displayName: event?.locals.user?.displayName, email: event?.locals.user?.email}
+}
+
 export default function Sidebar(props: SidebarProps) {
+  const [user] = createResource(getLocalsUser);
+
   const [collapsed, setCollapsed] = createSignal(false);
+
+  const navigate = useNavigate();
   const location = useLocation();
 
   const variant = (match: (path: string) => boolean) =>
@@ -57,19 +81,24 @@ export default function Sidebar(props: SidebarProps) {
     },
   ];
 
+  async function logout() {
+    await serverLogout();
+    navigate("/login");
+  }
+
   return (
     <aside
       data-collapsed={collapsed()}
       class={cn(
         "flex flex-col gap-1 border-r border-sidebar-border bg-sidebar text-sidebar-foreground p-2 px-3",
         "transition-[width] duration-150",
-        collapsed() ? "w-14" : "w-60",
+        collapsed() ? "w-16 items-center" : "w-52",
       )}
     >
       <div
         class={cn(
           "flex items-center gap-2 px-2 py-2",
-          collapsed() && "justify-center px-0",
+          collapsed() ? "justify-center px-0" : "mb-2.5",
         )}
       >
         <Show when={!collapsed()}>
@@ -106,6 +135,45 @@ export default function Sidebar(props: SidebarProps) {
         </div>
 
         <Nav isCollapsed={collapsed()} links={zoneLinks(props.zone!)} />
+      </Show>
+
+      <div class="flex-1" />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        class="mb-2"
+        onClick={() => setCollapsed((c) => !c)}
+      >
+        <Show when={collapsed()} fallback={
+          <span class="inline-flex items-center gap-1.5 text-xs">
+            <ChevronsLeft size={13} /> Collapse
+          </span>
+        }>
+          <ChevronsRight size={13} />
+        </Show>
+      </Button>
+
+      <Show when={user()}>
+        <div class={cn(
+            "flex items-center gap-2 rounded-md border border-sidebar-border bg-card/60 p-2",
+            collapsed() && "border-transparent bg-transparent justify-center p-1",
+        )}>
+          <div class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ctp-yellow text-[11px] font-semibold text-ctp-base">
+            {user()?.displayName?.charAt(0).toUpperCase()}
+          </div>
+
+          <Show when={!collapsed()}>
+            <div class="flex min-w-0 flex-col leading-none gap-1">
+              <p class="truncate text-[12.5px] font-semibold -mt-0.5">{user()?.displayName}</p>
+              <span class="truncate text-[11px] text-muted-foreground">{user()?.email}</span>
+            </div>
+
+            <button class="ml-auto text-muted-foreground hover:text-foreground" onClick={logout}>
+              <LogOut size={15} />
+            </button>
+          </Show>
+        </div>
       </Show>
     </aside>
   );

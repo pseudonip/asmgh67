@@ -10,7 +10,7 @@ import { db } from "./db";
 import { users, sessions } from "./db/schema";
 import { getUserFromToken } from "./auth.server";
 
-export async function register(email: string, password: string) {
+export async function register({ displayName, email, password }: { displayName: string; email: string; password: string }) {
   try {
     const emailExists = await db
       .select()
@@ -31,6 +31,7 @@ export async function register(email: string, password: string) {
   const [user] = await db
     .insert(users)
     .values({
+      displayName,
       email,
       passwordHash,
     })
@@ -84,6 +85,32 @@ export async function login(email: string, password: string) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 60 * 60 * 24 * 7, // 1 week
+  });
+}
+
+export async function logout() {
+  const req = getRequestEvent()?.request;
+
+  let token;
+
+  try {
+    token = getCookie("token");
+  } catch {
+    const cookieHeader = req?.headers.get("cookie") ?? "";
+    token = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
+  }
+
+  if (token) {
+    const sha256 = createHash("sha256").update(token).digest();
+
+    await db.delete(sessions).where(eq(sessions.tokenHash, sha256)).execute();
+  }
+
+  setCookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 0,
   });
 }
 
