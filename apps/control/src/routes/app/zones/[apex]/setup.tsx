@@ -30,7 +30,7 @@ export default function ZoneSetup() {
       navigate("/app");
     }
 
-    if (status!.complete) {
+    if (status?.complete) {
       navigate("..");
     }
 
@@ -96,7 +96,7 @@ export default function ZoneSetup() {
               </For>
             </div>
 
-            <Show when={setupData()?.remove.length}>
+            <Show when={setupData()?.remove?.length}>
               <p>
                 These nameservers might cause conflicts and should be removed:
               </p>
