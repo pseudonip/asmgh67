@@ -122,10 +122,7 @@ export async function logout() {
   });
 }
 
-export async function changePassword(
-  oldPassword: string,
-  newPassword: string,
-) {
+export async function changePassword(oldPassword: string, newPassword: string) {
   const user = await getUser();
 
   if (!user) {
@@ -140,7 +137,11 @@ export async function changePassword(
 
   const newHash = await bcrypt.hash(newPassword, 12);
 
-  await db.update(users).set({ passwordHash: newHash }).where(eq(users.id, user.id)).execute();
+  await db
+    .update(users)
+    .set({ passwordHash: newHash })
+    .where(eq(users.id, user.id))
+    .execute();
 }
 
 export async function getUser() {

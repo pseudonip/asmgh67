@@ -20,6 +20,10 @@ async function requireUser() {
 }
 
 export async function createZone(name: string) {
+  if (!/^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,63}$/.test(name)) {
+    throw new Error("Invalid domain name");
+  }
+
   const user = await requireUser();
 
   return await createZoneForUser(user.id, name);

@@ -18,14 +18,18 @@ export default function handle(query: Packet, state: State): Packet {
   const qtype = question.type.toUpperCase();
 
   const zone = state.findZone(qname);
-  if (!zone) return errorResp(query, RCODES.NXDOMAIN);
+  if (!zone) return errorResp(query, RCODES.REFUSED);
 
   const isApex = qname === zone.name;
 
   if (isApex && qtype === "SOA") return soaResp(query, zone);
   if (isApex && qtype === "NS") return nsResp(query, zone);
 
-  const records = state.lookup(zone, qname, qtype);
+  let records = state.lookup(zone, qname, qtype);
+
+  if (records.length === 0 && qtype != "CNAME") {
+    records = state.lookup(zone, qname, "CNAME");
+  }
 
   if (records.length > 0) return answerResp(query, zone, records);
 
@@ -142,6 +146,10 @@ function soaResp(query: Packet, zone: Zone): Packet {
         mname: process.env.SOA_MNAME!,
         rname: process.env.SOA_RNAME!,
         serial: zone.serial,
+        refresh: 10800,
+        retry: 3600,
+        expire: 604800,
+        minimum: 300,
       },
     },
   ];

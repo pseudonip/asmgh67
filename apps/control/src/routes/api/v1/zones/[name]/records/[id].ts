@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getApiUserFromRequest } from "~/lib/server/api.server";
 import { db } from "~/lib/server/db";
 import { records, zones } from "~/lib/server/db/schema";
@@ -26,7 +26,7 @@ export async function DELETE({ params, request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  await db.delete(records).where(eq(records.id, id)).execute();
+  await db.delete(records).where(and(eq(records.id, id), eq(records.zoneId, zone.id))).execute();
 
   return Response.json({ success: true });
 }

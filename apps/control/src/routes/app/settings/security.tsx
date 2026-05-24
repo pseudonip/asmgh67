@@ -32,7 +32,11 @@ export default function SecuritySettings() {
       setSuccess("Password updated successfully");
     } catch (e) {
       console.error("Failed to change password:", e);
-      setError(e instanceof Error ? e.message : "An error occurred while changing your password.");
+      setError(
+        e instanceof Error
+          ? e.message
+          : "An error occurred while changing your password.",
+      );
     }
   }
 
