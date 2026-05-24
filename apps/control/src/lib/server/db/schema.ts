@@ -6,6 +6,7 @@ import {
   jsonb,
   pgTable,
   text,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -84,7 +85,9 @@ export const records = pgTable("records", {
   ttl: text("ttl", { enum: ["auto", "5m", "1h", "1d"] })
     .notNull()
     .default("auto"),
-});
+}, (t) => [
+  unique("records_zone_name_type_data_uq").on(t.zoneId, t.name, t.type, t.data),
+]);
 
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;

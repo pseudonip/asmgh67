@@ -64,6 +64,13 @@
       "when": 1779564901730,
       "tag": "0008_known_ares",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1779613408409,
+      "tag": "0009_closed_the_hand",
+      "breakpoints": true
     }
   ]
 }
