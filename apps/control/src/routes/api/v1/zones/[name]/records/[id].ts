@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { getApiUserFromRequest } from "~/lib/server/api.server";
 import { db } from "~/lib/server/db";
 import { records, zones } from "~/lib/server/db/schema";
+import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
 export async function DELETE({ params, request }) {
   const { name, id } = params;
@@ -27,6 +28,8 @@ export async function DELETE({ params, request }) {
   }
 
   await db.delete(records).where(and(eq(records.id, id), eq(records.zoneId, zone.id))).execute();
+
+  await sendZoneUpdate(zone.name);
 
   return Response.json({ success: true });
 }
