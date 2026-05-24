@@ -12,7 +12,8 @@ export async function DELETE({ params, request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const [zone] = await db.select()
+  const [zone] = await db
+    .select()
     .from(zones)
     .where(eq(zones.name, name))
     .execute();

@@ -10,7 +10,15 @@ import { db } from "./db";
 import { users, sessions } from "./db/schema";
 import { getUserFromToken } from "./auth.server";
 
-export async function register({ displayName, email, password }: { displayName: string; email: string; password: string }) {
+export async function register({
+  displayName,
+  email,
+  password,
+}: {
+  displayName: string;
+  email: string;
+  password: string;
+}) {
   try {
     const emailExists = await db
       .select()

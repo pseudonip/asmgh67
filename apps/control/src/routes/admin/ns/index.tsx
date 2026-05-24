@@ -1,6 +1,4 @@
-import {
-  ColumnDef,
-} from "@tanstack/solid-table";
+import { ColumnDef } from "@tanstack/solid-table";
 import { A, createAsync } from "@solidjs/router";
 import { Button } from "~/components/ui/button";
 import { Nameserver } from "~/lib/server/db/schema";
@@ -36,7 +34,11 @@ export default function AdminNs() {
         </Button>
       </div>
 
-      <Table columns={columns} data={nameservers() ?? []} noEntriesMessage="No nameservers found" />
+      <Table
+        columns={columns}
+        data={nameservers() ?? []}
+        noEntriesMessage="No nameservers found"
+      />
     </main>
   );
 }

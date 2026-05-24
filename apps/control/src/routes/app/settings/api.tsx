@@ -3,7 +3,11 @@ import { Trash } from "lucide-solid";
 import { createResource, createSignal, Show } from "solid-js";
 import Table from "~/components/Table";
 import { Button } from "~/components/ui/button";
-import { TextField, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field";
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldLabel,
+} from "~/components/ui/text-field";
 import { createApiKey, getApiKeys } from "~/lib/server/api.actions";
 
 const columns: ColumnDef<{ name: string }>[] = [
@@ -34,8 +38,8 @@ const columns: ColumnDef<{ name: string }>[] = [
           </button>
         </div>
       );
-    }
-  }
+    },
+  },
 ];
 
 export default function APISettings() {
@@ -51,7 +55,7 @@ export default function APISettings() {
       const key = await createApiKey(keyName());
 
       setKeys((prev) => [...(prev ?? []), { id: key.id, name: keyName() }]);
-      setKeyToken(key.token)
+      setKeyToken(key.token);
       setKeyName("");
     } catch (e) {
       console.error("Failed to create API key:", e);
@@ -78,7 +82,10 @@ export default function APISettings() {
 
         <Show when={keyToken()}>
           <div class="p-4 bg-card border rounded-lg mb-4 flex-col w-1/2">
-            <p class="text-sm text-muted-foreground mb-2">Your new API key token. This is the only time you will be able to see it, so make sure to copy it now!</p>
+            <p class="text-sm text-muted-foreground mb-2">
+              Your new API key token. This is the only time you will be able to
+              see it, so make sure to copy it now!
+            </p>
             <code class="block overflow-x-auto text-sm bg-ctp-mantle border rounded-lg p-1 px-2 mt-1 font-mono!">
               {keyToken()}
             </code>
@@ -86,7 +93,11 @@ export default function APISettings() {
         </Show>
       </div>
 
-      <Table columns={columns} data={keys() ?? []} noEntriesMessage="No API keys found" />
+      <Table
+        columns={columns}
+        data={keys() ?? []}
+        noEntriesMessage="No API keys found"
+      />
     </main>
   );
 }

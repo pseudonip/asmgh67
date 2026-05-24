@@ -7,6 +7,21 @@ export const recordSchemas = {
   NS: z.object({ target: z.string().min(1) }),
   PTR: z.object({ target: z.string().min(1) }),
   TXT: z.object({ text: z.string() }),
+  MX: z.object({
+    priority: z.number().int().nonnegative(),
+    target: z.string().min(1),
+  }),
+  SRV: z.object({
+    priority: z.number().int().nonnegative(),
+    weight: z.number().int().nonnegative(),
+    port: z.number().int().min(1).max(65535),
+    target: z.string().min(1),
+  }),
+  CAA: z.object({
+    flags: z.number().int().min(0).max(255),
+    tag: z.enum(["issue", "issuewild", "iodef"]),
+    value: z.string().min(1),
+  }),
 };
 
 export type RecordType = keyof typeof recordSchemas;

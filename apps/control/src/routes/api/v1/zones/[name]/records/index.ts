@@ -17,7 +17,8 @@ export async function GET({ params, request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const [zone] = await db.select()
+  const [zone] = await db
+    .select()
     .from(zones)
     .where(eq(zones.name, name))
     .execute();
@@ -30,13 +31,14 @@ export async function GET({ params, request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const recordsData = await db.select()
+  const recordsData = await db
+    .select()
     .from(records)
     .where(
       and(
         eq(records.zoneId, zone.id),
         search ? ilike(records.name, search) : undefined,
-      )
+      ),
     )
     .execute();
 
@@ -52,7 +54,8 @@ export async function PUT({ params, request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const [zone] = await db.select()
+  const [zone] = await db
+    .select()
     .from(zones)
     .where(eq(zones.name, name))
     .execute();
@@ -77,18 +80,24 @@ export async function PUT({ params, request }) {
     }
 
     if (!["auto", "5m", "1h", "1d"].includes(record.ttl || "auto")) {
-      return new Response("Invalid TTL value, should be auto, 5m, 1h or 1d", { status: 400 });
+      return new Response("Invalid TTL value, should be auto, 5m, 1h or 1d", {
+        status: 400,
+      });
     }
 
     const result = validateRecordData(record.type, record.data);
 
     if (!result.ok) {
-      return new Response(`Invalid record data for type ${record.type}: ${result.error}`, { status: 400 });
+      return new Response(
+        `Invalid record data for type ${record.type}: ${result.error}`,
+        { status: 400 },
+      );
     }
   }
 
   try {
-    const created = await db.insert(records)
+    const created = await db
+      .insert(records)
       .values(
         body.map((record) => ({
           zoneId: zone.id,
@@ -96,7 +105,7 @@ export async function PUT({ params, request }) {
           type: record.type,
           data: record.data,
           ttl: record.ttl || "auto",
-        }))
+        })),
       )
       .returning()
       .execute();
@@ -106,20 +115,30 @@ export async function PUT({ params, request }) {
     return Response.json({
       created: created.map((r) => ({
         id: r.id,
-        name: r.name
-      }))
+        name: r.name,
+      })),
     });
   } catch (e) {
-    if (e instanceof Error && e.message.includes("records_zone_name_type_data_uq")) {
-      return Response.json({
-        error: "Duplicate record",
-        message: "A record with the same name, type and data already exists in this zone."
-      }, { status: 400 });
+    if (
+      e instanceof Error &&
+      e.message.includes("records_zone_name_type_data_uq")
+    ) {
+      return Response.json(
+        {
+          error: "Duplicate record",
+          message:
+            "A record with the same name, type and data already exists in this zone.",
+        },
+        { status: 400 },
+      );
     }
 
-    return Response.json({
-      error: "Failed to create records",
-      message: e instanceof Error ? e.message : String(e)
-    }, { status: 500 });
+    return Response.json(
+      {
+        error: "Failed to create records",
+        message: e instanceof Error ? e.message : String(e),
+      },
+      { status: 500 },
+    );
   }
 }

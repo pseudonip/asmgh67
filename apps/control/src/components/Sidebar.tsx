@@ -1,5 +1,14 @@
 import { useLocation, useNavigate } from "@solidjs/router";
-import { ChevronsLeft, ChevronsRight, Globe, Home, List, LogOut, Server, Settings } from "lucide-solid";
+import {
+  ChevronsLeft,
+  ChevronsRight,
+  Globe,
+  Home,
+  List,
+  LogOut,
+  Server,
+  Settings,
+} from "lucide-solid";
 import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
 import DomainSwitcher from "./DomainSwitcher";
@@ -14,7 +23,9 @@ interface SidebarProps {
   admin?: boolean;
 }
 
-async function getLocalsUser(): Promise<{ displayName: string; email: string; isAdmin: boolean } | undefined> {
+async function getLocalsUser(): Promise<
+  { displayName: string; email: string; isAdmin: boolean } | undefined
+> {
   "use server";
   const event = getRequestEvent();
 
@@ -22,13 +33,21 @@ async function getLocalsUser(): Promise<{ displayName: string; email: string; is
     const user = await getUser();
 
     if (user) {
-      return { displayName: user.displayName, email: user.email, isAdmin: user.isAdmin };
+      return {
+        displayName: user.displayName,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      };
     } else {
       return undefined;
     }
   }
 
-  return { displayName: event?.locals.user?.displayName, email: event?.locals.user?.email, isAdmin: event?.locals.user?.isAdmin };
+  return {
+    displayName: event?.locals.user?.displayName,
+    email: event?.locals.user?.email,
+    isAdmin: event?.locals.user?.isAdmin,
+  };
 }
 
 export default function Sidebar(props: SidebarProps) {
@@ -54,7 +73,7 @@ export default function Sidebar(props: SidebarProps) {
       url: "/app/settings",
       icon: Settings,
       variant: variant((p) => p.startsWith("/app/settings")),
-    }
+    },
   ];
 
   const zoneLinks = (domain: string) => [
@@ -110,13 +129,22 @@ export default function Sidebar(props: SidebarProps) {
         <Show when={!collapsed()}>
           <p class="text-[15px] font-semibold tracking-light">Raincloud</p>
 
-          <Show when={user()?.isAdmin && !props.admin} fallback={
-            <a href="/app" class="text-xs ml-auto text-muted-foreground! flex leading-none">
-              app
-              <ChevronsRight size={12} class="ml-1 mt-[0.5px]" />
-            </a>
-          }>
-            <a href="/admin" class="text-xs ml-auto text-muted-foreground! flex leading-none">
+          <Show
+            when={user()?.isAdmin && !props.admin}
+            fallback={
+              <a
+                href="/app"
+                class="text-xs ml-auto text-muted-foreground! flex leading-none"
+              >
+                app
+                <ChevronsRight size={12} class="ml-1 mt-[0.5px]" />
+              </a>
+            }
+          >
+            <a
+              href="/admin"
+              class="text-xs ml-auto text-muted-foreground! flex leading-none"
+            >
               admin
               <ChevronsRight size={12} class="ml-1 mt-[0.5px]" />
             </a>
@@ -163,31 +191,44 @@ export default function Sidebar(props: SidebarProps) {
         class="mb-2"
         onClick={() => setCollapsed((c) => !c)}
       >
-        <Show when={collapsed()} fallback={
-          <span class="inline-flex items-center gap-1.5 text-xs">
-            <ChevronsLeft size={13} /> Collapse
-          </span>
-        }>
+        <Show
+          when={collapsed()}
+          fallback={
+            <span class="inline-flex items-center gap-1.5 text-xs">
+              <ChevronsLeft size={13} /> Collapse
+            </span>
+          }
+        >
           <ChevronsRight size={13} />
         </Show>
       </Button>
 
       <Show when={user()}>
-        <div class={cn(
+        <div
+          class={cn(
             "flex items-center gap-2 rounded-md border border-sidebar-border bg-card/60 p-2",
-            collapsed() && "border-transparent bg-transparent justify-center p-1",
-        )}>
+            collapsed() &&
+              "border-transparent bg-transparent justify-center p-1",
+          )}
+        >
           <div class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ctp-yellow text-[11px] font-semibold text-ctp-base">
             {user()?.displayName?.charAt(0).toUpperCase()}
           </div>
 
           <Show when={!collapsed()}>
             <div class="flex min-w-0 flex-col leading-none gap-1">
-              <p class="truncate text-[12.5px] font-semibold -mt-0.5">{user()?.displayName}</p>
-              <span class="truncate text-[11px] text-muted-foreground">{user()?.email}</span>
+              <p class="truncate text-[12.5px] font-semibold -mt-0.5">
+                {user()?.displayName}
+              </p>
+              <span class="truncate text-[11px] text-muted-foreground">
+                {user()?.email}
+              </span>
             </div>
 
-            <button class="ml-auto text-muted-foreground hover:text-foreground" onClick={logout}>
+            <button
+              class="ml-auto text-muted-foreground hover:text-foreground"
+              onClick={logout}
+            >
               <LogOut size={15} />
             </button>
           </Show>

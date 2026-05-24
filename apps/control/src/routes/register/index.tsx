@@ -40,7 +40,11 @@ export default function Login() {
     }
 
     try {
-      await serverRegister({ displayName: displayName(), email: email(), password: password() });
+      await serverRegister({
+        displayName: displayName(),
+        email: email(),
+        password: password(),
+      });
       navigate("/app");
     } catch (err) {
       setError(
@@ -56,8 +60,8 @@ export default function Login() {
           <CardHeader class="space-y-1">
             <CardTitle class="text-2xl">Create an account</CardTitle>
             <CardDescription>
-              Enter your display name, email and password to register. Already have an
-              account? <a href="/login">Log in</a>
+              Enter your display name, email and password to register. Already
+              have an account? <a href="/login">Log in</a>
             </CardDescription>
           </CardHeader>
 

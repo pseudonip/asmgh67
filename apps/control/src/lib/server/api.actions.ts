@@ -6,7 +6,9 @@ import { apiKeys } from "./db/schema";
 import { eq } from "drizzle-orm";
 import { getUser } from "./auth.actions";
 
-export async function createApiKey(name: string): Promise<{ id: string; token: string }> {
+export async function createApiKey(
+  name: string,
+): Promise<{ id: string; token: string }> {
   const user = await getUser();
 
   if (!user) {
@@ -16,7 +18,8 @@ export async function createApiKey(name: string): Promise<{ id: string; token: s
   const token = "rc_api_" + randomBytes(32).toString("hex");
   const hash = createHash("sha256").update(token).digest();
 
-  const [key] = await db.insert(apiKeys)
+  const [key] = await db
+    .insert(apiKeys)
     .values({
       userId: user.id,
       name,
@@ -28,7 +31,7 @@ export async function createApiKey(name: string): Promise<{ id: string; token: s
   return {
     id: key.id,
     token,
-  }
+  };
 }
 
 export async function getApiKeys(): Promise<{ id: string; name: string }[]> {
@@ -38,7 +41,8 @@ export async function getApiKeys(): Promise<{ id: string; name: string }[]> {
     throw new Error("Unauthorized");
   }
 
-  const keys = await db.select()
+  const keys = await db
+    .select()
     .from(apiKeys)
     .where(eq(apiKeys.userId, user.id))
     .execute();

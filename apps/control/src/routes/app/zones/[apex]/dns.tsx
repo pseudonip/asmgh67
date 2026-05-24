@@ -11,7 +11,7 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createResource, createSignal, onMount, Show } from "solid-js";
+import { createResource, createSignal, Show } from "solid-js";
 import { Record } from "~/lib/server/db/schema";
 import { RecordData } from "@raincloud/types/records";
 import { Button } from "~/components/ui/button";
@@ -74,22 +74,26 @@ export default function ZoneDNS() {
   const [records, { mutate: setRecords }] = createResource(
     () => zoneData()?.id,
     async (id) => {
-      return (await getZoneRecords(id)).sort((a, b) => a.type.localeCompare(b.type));
-    }
+      return (await getZoneRecords(id)).sort((a, b) =>
+        a.type.localeCompare(b.type),
+      );
+    },
   );
 
   const data = () =>
     records()?.map((d) => {
       let data = "";
 
-      if (d.type == "A") data = d.data?.address;
-      if (d.type == "AAAA") data = d.data?.address;
-
-      if (d.type == "CNAME") data = d.data?.target;
-      if (d.type == "NS") data = d.data?.target;
-      if (d.type == "PTR") data = d.data?.target;
-
+      if (d.type == "A" || d.type == "AAAA") data = d.data?.address;
+      if (d.type == "CNAME" || d.type == "NS" || d.type == "PTR")
+        data = d.data?.target;
       if (d.type == "TXT") data = d.data?.text;
+      if (d.type == "MX")
+        data = `priority = ${d.data?.priority}; target = ${d.data?.target}`;
+      if (d.type == "SRV")
+        data = `priority = ${d.data?.priority}; weight = ${d.data?.weight}; port = ${d.data?.port}; target = ${d.data?.target}`;
+      if (d.type == "CAA")
+        data = `flags = ${d.data?.flags}; tag = ${d.data?.tag}; value = ${d.data?.value}`;
 
       return { ...d, data };
     }) || [];
@@ -110,14 +114,16 @@ export default function ZoneDNS() {
   const displayValue = () => {
     if (!rData()) return "";
 
-    if (rType() == "A") return rData()?.address;
-    if (rType() == "AAAA") return rData()?.address;
-
-    if (rType() == "CNAME") return rData()?.target;
-    if (rType() == "NS") return rData()?.target;
-    if (rType() == "PTR") return rData()?.target;
-
+    if (rType() == "A" || rType() == "AAAA") return rData()?.address;
+    if (rType() == "CNAME" || rType() == "NS" || rType() == "PTR")
+      return rData()?.target;
     if (rType() == "TXT") return rData()?.text;
+    if (rType() == "MX")
+      return `priority = ${rData()?.priority}; target = ${rData()?.target}`;
+    if (rType() == "SRV")
+      return `priority = ${rData()?.priority}; weight = ${rData()?.weight}; port = ${rData()?.port}; target = ${rData()?.target}`;
+    if (rType() == "CAA")
+      return `flags = ${rData()?.flags}; tag = ${rData()?.tag}; value = ${rData()?.value}`;
 
     return "";
   };
@@ -165,7 +171,7 @@ export default function ZoneDNS() {
                 ? zoneData()?.name
                 : `${rName()}.${zoneData()?.name}`
               : "[record name]"}{" "}
-            will be an {rType()} record pointing to{" "}
+            will be an {rType()} record with data{" "}
             {displayValue()?.length > 0 ? displayValue() : "[target]"}
           </div>
         </div>
@@ -177,7 +183,17 @@ export default function ZoneDNS() {
             <Select
               value={rType()}
               onChange={setRType}
-              options={["A", "AAAA", "CNAME", "NS", "PTR", "TXT"]}
+              options={[
+                "A",
+                "AAAA",
+                "CNAME",
+                "NS",
+                "PTR",
+                "TXT",
+                "MX",
+                "SRV",
+                "CAA",
+              ]}
               class="mt-1"
               itemComponent={(itemProps) => (
                 <SelectItem item={itemProps.item}>
@@ -194,7 +210,7 @@ export default function ZoneDNS() {
             </Select>
           </div>
 
-          <TextField class="w-1/5">
+          <TextField class="w-1/6">
             <TextFieldLabel>Name</TextFieldLabel>
             <TextFieldInput
               value={rName()}
@@ -238,6 +254,180 @@ export default function ZoneDNS() {
                   class="font-mono! lowercase"
                 />
               </TextField>
+            </Show>
+
+            <Show when={rType() == "MX"}>
+              <div class="flex gap-2">
+                <TextField class="flex-1">
+                  <TextFieldLabel>Priority</TextFieldLabel>
+                  <TextFieldInput
+                    type="number"
+                    value={rData()?.priority}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            priority: Number(e.currentTarget.value),
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+                <TextField class="flex-1">
+                  <TextFieldLabel>Target</TextFieldLabel>
+                  <TextFieldInput
+                    value={rData()?.target}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            target: e.currentTarget.value,
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+              </div>
+            </Show>
+
+            <Show when={rType() == "SRV"}>
+              <div class="flex gap-2">
+                <TextField class="flex-1">
+                  <TextFieldLabel>Priority</TextFieldLabel>
+                  <TextFieldInput
+                    type="number"
+                    value={rData()?.priority}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            priority: Number(e.currentTarget.value),
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+                <TextField class="flex-1">
+                  <TextFieldLabel>Weight</TextFieldLabel>
+                  <TextFieldInput
+                    type="number"
+                    value={rData()?.weight}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            weight: Number(e.currentTarget.value),
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+                <TextField class="flex-1">
+                  <TextFieldLabel>Port</TextFieldLabel>
+                  <TextFieldInput
+                    type="number"
+                    value={rData()?.port}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            port: Number(e.currentTarget.value),
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+                <TextField class="flex-1">
+                  <TextFieldLabel>Target</TextFieldLabel>
+                  <TextFieldInput
+                    value={rData()?.target}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            target: e.currentTarget.value,
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+              </div>
+            </Show>
+
+            <Show when={rType() == "CAA"}>
+              <div class="flex gap-2">
+                <TextField class="flex-1">
+                  <TextFieldLabel>Flags</TextFieldLabel>
+                  <TextFieldInput
+                    type="number"
+                    value={rData()?.flags}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            flags: Number(e.currentTarget.value),
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+
+                <div class="flex-1">
+                  <p class="text-sm leading-none">Tag</p>
+
+                  <Select
+                    value={rData()?.tag}
+                    onChange={(value) =>
+                      setRData((d) => ({ ...d, tag: value }) as RecordData)
+                    }
+                    options={["issue", "issuewild", "iodef"]}
+                    class="mt-1"
+                    itemComponent={(itemProps) => (
+                      <SelectItem item={itemProps.item}>
+                        {itemProps.item.rawValue}
+                      </SelectItem>
+                    )}
+                  >
+                    <SelectTrigger aria-label="CAA tag">
+                      <SelectValue<string>>
+                        {(state) => state.selectedOption()}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent />
+                  </Select>
+                </div>
+
+                <TextField class="flex-1">
+                  <TextFieldLabel>Value</TextFieldLabel>
+                  <TextFieldInput
+                    value={rData()?.value}
+                    onInput={(e) =>
+                      setRData(
+                        (d) =>
+                          ({
+                            ...d,
+                            value: e.currentTarget.value,
+                          }) as RecordData,
+                      )
+                    }
+                    class="font-mono! lowercase"
+                  />
+                </TextField>
+              </div>
             </Show>
           </div>
 

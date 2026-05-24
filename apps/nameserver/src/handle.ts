@@ -48,7 +48,23 @@ function toDnsData(type: string, data: any): any {
     case "TXT":
       return data.text;
 
-    // todo: finish types
+    case "MX":
+      return { preference: data.priority, exchange: data.target };
+
+    case "SRV":
+      return {
+        priority: data.priority,
+        weight: data.weight,
+        port: data.port,
+        target: data.target,
+      };
+
+    case "CAA":
+      return {
+        flags: data.flags,
+        tag: data.tag,
+        value: data.value,
+      };
 
     default:
       return data;

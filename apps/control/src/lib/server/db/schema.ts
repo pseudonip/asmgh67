@@ -74,20 +74,29 @@ export const zones = pgTable("zones", {
   nsPool: text("ns_pool").notNull().default("default"),
 });
 
-export const records = pgTable("records", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  zoneId: uuid("zone_id")
-    .notNull()
-    .references(() => zones.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  type: text("type").notNull(),
-  data: jsonb("data").$type<RecordData>().notNull(),
-  ttl: text("ttl", { enum: ["auto", "5m", "1h", "1d"] })
-    .notNull()
-    .default("auto"),
-}, (t) => [
-  unique("records_zone_name_type_data_uq").on(t.zoneId, t.name, t.type, t.data),
-]);
+export const records = pgTable(
+  "records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    zoneId: uuid("zone_id")
+      .notNull()
+      .references(() => zones.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    type: text("type").notNull(),
+    data: jsonb("data").$type<RecordData>().notNull(),
+    ttl: text("ttl", { enum: ["auto", "5m", "1h", "1d"] })
+      .notNull()
+      .default("auto"),
+  },
+  (t) => [
+    unique("records_zone_name_type_data_uq").on(
+      t.zoneId,
+      t.name,
+      t.type,
+      t.data,
+    ),
+  ],
+);
 
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;

@@ -20,7 +20,7 @@ export default function App(props: { children: any }) {
       url: "/app/settings/api",
       icon: Key,
       variant: variant((path) => path === "/app/settings/api"),
-    }
+    },
   ];
 
   return (

@@ -16,12 +16,19 @@ export const columns: ColumnDef<Zone>[] = [
       return (
         <div class="flex">
           <Globe class="w-3 h-3 my-auto mr-2 text-muted-foreground" />
-          <A href={zone.status === "pending" ? `/app/zones/${zone.name}/setup` : `/app/zones/${zone.name}`} class="text-ctp-blue hover:underline">
+          <A
+            href={
+              zone.status === "pending"
+                ? `/app/zones/${zone.name}/setup`
+                : `/app/zones/${zone.name}`
+            }
+            class="text-ctp-blue hover:underline"
+          >
             {zone.name}
           </A>
         </div>
       );
-    }
+    },
   },
   {
     accessorKey: "status",
@@ -29,11 +36,23 @@ export const columns: ColumnDef<Zone>[] = [
     cell: (info) => {
       switch (info.getValue()) {
         case "active":
-          return <span class="text-xs text-ctp-green p-1 px-3 rounded-full bg-ctp-green/10">Active</span>;
+          return (
+            <span class="text-xs text-ctp-green p-1 px-3 rounded-full bg-ctp-green/10">
+              Active
+            </span>
+          );
         case "pending":
-          return <span class="text-xs text-ctp-yellow p-1 px-3 rounded-full bg-ctp-yellow/10">Pending</span>;
+          return (
+            <span class="text-xs text-ctp-yellow p-1 px-3 rounded-full bg-ctp-yellow/10">
+              Pending
+            </span>
+          );
         case "error":
-          return <span class="text-xs text-ctp-red p-1 px-3 rounded-full bg-ctp-red/10">Error</span>;
+          return (
+            <span class="text-xs text-ctp-red p-1 px-3 rounded-full bg-ctp-red/10">
+              Error
+            </span>
+          );
       }
     },
   },
