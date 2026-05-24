@@ -15,7 +15,9 @@ export default createMiddleware({
 
     const cookieHeader = event.request.headers.get("cookie") ?? "";
     const token = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
-    const user = token ? await getUserFromToken(token) : null;
+
+    let user = token ? await getUserFromToken(token) : null;
+    delete user?.passwordHash;
     event.locals.user = user;
 
     if (url.pathname.startsWith("/app") && !user) {

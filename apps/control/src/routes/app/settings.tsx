@@ -1,5 +1,5 @@
 import { useLocation } from "@solidjs/router";
-import { Key, User } from "lucide-solid";
+import { Key, Shield } from "lucide-solid";
 import Nav from "~/components/Nav";
 
 export default function App(props: { children: any }) {
@@ -10,10 +10,10 @@ export default function App(props: { children: any }) {
 
   const links = () => [
     {
-      title: "Profile",
-      url: "/app/settings",
-      icon: User,
-      variant: variant((path) => path === "/app/settings"),
+      title: "Security",
+      url: "/app/settings/security",
+      icon: Shield,
+      variant: variant((path) => path === "/app/settings/security"),
     },
     {
       title: "API Tokens",

@@ -122,6 +122,27 @@ export async function logout() {
   });
 }
 
+export async function changePassword(
+  oldPassword: string,
+  newPassword: string,
+) {
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  const passwordValid = await bcrypt.compare(oldPassword, user.passwordHash);
+
+  if (!passwordValid) {
+    throw new Error("Old password is incorrect");
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 12);
+
+  await db.update(users).set({ passwordHash: newHash }).where(eq(users.id, user.id)).execute();
+}
+
 export async function getUser() {
   const req = getRequestEvent()?.request;
 

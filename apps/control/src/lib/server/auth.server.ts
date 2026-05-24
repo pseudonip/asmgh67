@@ -5,7 +5,7 @@ import { sessions, User, users } from "./db/schema";
 
 export async function getUserFromToken(
   token: string,
-): Promise<Omit<User, "passwordHash"> | null> {
+): Promise<User | null> {
   const sha256 = createHash("sha256").update(token).digest();
 
   const [session] = await db
@@ -21,8 +21,6 @@ export async function getUserFromToken(
     .execute();
 
   if (!session) return null;
-
-  delete session.user.passwordHash;
 
   return session.user;
 }
