@@ -42,5 +42,5 @@ async function flush() {
 }
 
 export function startStats() {
-  setInterval(flush, 1000 * 10); // every 5 mins
+  setInterval(flush, 1000 * 60 * 5); // every 5 mins
 }
