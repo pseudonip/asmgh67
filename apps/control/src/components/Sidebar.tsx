@@ -116,7 +116,7 @@ export default function Sidebar(props: SidebarProps) {
       url: "/admin/users",
       icon: User,
       variant: variant((p) => p === "/admin/users"),
-    }
+    },
   ];
 
   async function logout() {

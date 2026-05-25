@@ -16,7 +16,7 @@ export const columns: ColumnDef<Zone>[] = [
       return (
         <div class="flex">
           <Globe class="w-3 h-3 my-auto mr-2 text-muted-foreground" />
-          <A
+          <a
             href={
               zone.status === "pending"
                 ? `/app/zones/${zone.name}/setup`
@@ -25,7 +25,7 @@ export const columns: ColumnDef<Zone>[] = [
             class="text-ctp-blue hover:underline"
           >
             {zone.name}
-          </A>
+          </a>
         </div>
       );
     },

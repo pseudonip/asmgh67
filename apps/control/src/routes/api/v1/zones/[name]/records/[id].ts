@@ -27,7 +27,10 @@ export async function DELETE({ params, request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  await db.delete(records).where(and(eq(records.id, id), eq(records.zoneId, zone.id))).execute();
+  await db
+    .delete(records)
+    .where(and(eq(records.id, id), eq(records.zoneId, zone.id)))
+    .execute();
 
   await sendZoneUpdate(zone.name);
 
