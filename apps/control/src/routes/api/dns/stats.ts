@@ -1,7 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import { createHash } from "crypto";
 import { db } from "~/lib/server/db";
-import { nameservers, queryStats, records, zones } from "~/lib/server/db/schema";
+import {
+  nameservers,
+  queryStats,
+} from "~/lib/server/db/schema";
 
 export async function POST({ request }) {
   const auth = request.headers.get("Authorization");
@@ -23,13 +26,15 @@ export async function POST({ request }) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { stats }: {
+  const {
+    stats,
+  }: {
     stats: {
       bucket: string;
       zoneName: string;
       rcode: string;
       count: number;
-    }[]
+    }[];
   } = await request.json();
 
   console.log("Received stats:", stats);

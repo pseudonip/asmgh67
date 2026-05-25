@@ -17,7 +17,7 @@ async function flush() {
   counters.clear();
 
   const stats = snapshot.map(([key, count]) => {
-    const [bucket, zoneName, rcode] = key.split('|');
+    const [bucket, zoneName, rcode] = key.split("|");
     return { bucket, zoneName, rcode, count };
   });
 
@@ -27,8 +27,8 @@ async function flush() {
     const result = await fetch(`${process.env.CONTROL_SERVER}/api/dns/stats`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.AUTH_TOKEN}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ stats }),
     });

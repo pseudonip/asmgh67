@@ -141,3 +141,17 @@ a:not(.btn):hover {
 button:hover {
   cursor: pointer;
 }
+
+.chart-tooltip {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}

@@ -16,7 +16,10 @@ export const columns: ColumnDef<Zone>[] = [
         <div class="flex">
           <User class="w-4 h-4 my-auto mr-2 text-muted-foreground" />
 
-          <a href={`/admin/users/${user.id}`} class="text-ctp-blue hover:underline">
+          <a
+            href={`/admin/users/${user.id}`}
+            class="text-ctp-blue hover:underline"
+          >
             {user.id}
           </a>
         </div>

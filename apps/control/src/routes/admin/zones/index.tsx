@@ -19,9 +19,7 @@ export const columns: ColumnDef<Zone>[] = [
           <Globe class="w-3 h-3 my-auto mr-2 text-muted-foreground" />
 
           <a
-            href={
-              `/admin/zones/${zone.name}`
-            }
+            href={`/admin/zones/${zone.name}`}
             class="text-ctp-blue hover:underline"
           >
             {zone.name}

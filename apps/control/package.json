@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/solid-table": "^8.21.3",
     "bcrypt": "^6.0.0",
+    "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",

@@ -26,7 +26,7 @@ export default function handle(query: Packet, state: State): Packet {
   if (!zone) {
     recordQuery(qname, "REFUSED");
     return errorResp(query, RCODES.REFUSED);
-  };
+  }
 
   const isApex = qname === zone.name;
 
@@ -38,7 +38,7 @@ export default function handle(query: Packet, state: State): Packet {
   if (isApex && qtype === "NS") {
     recordQuery(qname, "NOERROR");
     return nsResp(query, zone);
-  };
+  }
 
   let records = state.lookup(zone, qname, qtype);
 
@@ -53,8 +53,8 @@ export default function handle(query: Packet, state: State): Packet {
 
   if (state.hasName(zone, qname)) {
     recordQuery(qname, "NOERROR");
-    return emptyResp(query, zone)
-  };
+    return emptyResp(query, zone);
+  }
 
   recordQuery(qname, "NXDOMAIN");
   return nxResp(query, zone);

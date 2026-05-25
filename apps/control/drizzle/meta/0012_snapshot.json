@@ -40,12 +40,8 @@
           "name": "api_keys_user_id_users_id_fk",
           "tableFrom": "api_keys",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -55,9 +51,7 @@
         "api_keys_token_hash_unique": {
           "name": "api_keys_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -108,16 +102,12 @@
         "nameservers_hostname_unique": {
           "name": "nameservers_hostname_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "hostname"
-          ]
+          "columns": ["hostname"]
         },
         "nameservers_auth_token_hash_unique": {
           "name": "nameservers_auth_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "auth_token_hash"
-          ]
+          "columns": ["auth_token_hash"]
         }
       },
       "policies": {},
@@ -175,11 +165,7 @@
       "compositePrimaryKeys": {
         "query_stats_zone_name_bucket_rcode_pk": {
           "name": "query_stats_zone_name_bucket_rcode_pk",
-          "columns": [
-            "zone_name",
-            "bucket",
-            "rcode"
-          ]
+          "columns": ["zone_name", "bucket", "rcode"]
         }
       },
       "uniqueConstraints": {},
@@ -236,12 +222,8 @@
           "name": "records_zone_id_zones_id_fk",
           "tableFrom": "records",
           "tableTo": "zones",
-          "columnsFrom": [
-            "zone_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["zone_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -251,12 +233,7 @@
         "records_zone_name_type_data_uq": {
           "name": "records_zone_name_type_data_uq",
           "nullsNotDistinct": false,
-          "columns": [
-            "zone_id",
-            "name",
-            "type",
-            "data"
-          ]
+          "columns": ["zone_id", "name", "type", "data"]
         }
       },
       "policies": {},
@@ -330,12 +307,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -345,9 +318,7 @@
         "sessions_token_hash_unique": {
           "name": "sessions_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -399,9 +370,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -459,12 +428,8 @@
           "name": "zones_user_id_users_id_fk",
           "tableFrom": "zones",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -474,9 +439,7 @@
         "zones_name_unique": {
           "name": "zones_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
