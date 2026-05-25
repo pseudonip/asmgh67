@@ -26,9 +26,16 @@ export default function AdminNs() {
   return (
     <main class="p-4 flex flex-col h-screen">
       <div class="flex mb-4">
-        <h1 class="text-2xl ml-2 leading-none my-auto font-semibold">
-          Nameservers
-        </h1>
+        <div>
+          <h1 class="text-2xl ml-1 leading-none my-auto font-semibold">
+            Nameservers
+          </h1>
+
+          <p class="text-sm text-muted-foreground ml-1 mt-1">
+            Raincloud name servers
+          </p>
+        </div>
+
         <Button as={A} href="/admin/ns/add" class="ml-auto btn">
           Add Nameserver
         </Button>

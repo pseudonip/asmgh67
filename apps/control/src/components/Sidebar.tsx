@@ -8,6 +8,7 @@ import {
   LogOut,
   Server,
   Settings,
+  User,
 } from "lucide-solid";
 import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
@@ -104,6 +105,18 @@ export default function Sidebar(props: SidebarProps) {
       icon: Server,
       variant: variant((p) => p === "/admin/ns"),
     },
+    {
+      title: "Zones",
+      url: "/admin/zones",
+      icon: Globe,
+      variant: variant((p) => p === "/admin/zones"),
+    },
+    {
+      title: "Users",
+      url: "/admin/users",
+      icon: User,
+      variant: variant((p) => p === "/admin/users"),
+    }
   ];
 
   async function logout() {
