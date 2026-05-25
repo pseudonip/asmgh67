@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { createHash } from "crypto";
 import { db } from "~/lib/server/db";
 import {
@@ -49,9 +49,13 @@ export async function POST({ request }) {
   console.log("Prepared data for insertion:", data);
 
   try {
-    const result = await db.insert(queryStats).values(data).returning();
-
-    console.log("Inserted stats:", result);
+    await db
+      .insert(queryStats)
+      .values(data)
+      .onConflictDoUpdate({
+        target: [queryStats.zoneName, queryStats.bucket, queryStats.rcode],
+        set: { count: sql`${queryStats.count} + excluded.count` },
+      }).execute();
 
     return new Response("OK");
   } catch (error) {
