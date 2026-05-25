@@ -36,10 +36,9 @@ await Bun.udpSocket({
     data(socket: any, data: any, port: number, address: string) {
       try {
         const query = dnsPacket.decode(Buffer.from(data));
-        console.log(`Received query from ${address}:${port}: `, query);
+        console.log(`Received query for ${query.questions?.map((q: any) => `${q.name}:${q.type}`).join(", ")}`);
 
         const res = handle(query, state);
-        console.log(res);
         const encoded = dnsPacket.encode(res);
 
         socket.send(encoded, port, address);

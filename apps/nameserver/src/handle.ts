@@ -111,7 +111,7 @@ function baseResp(query: Packet): Packet {
 
 function errorResp(query: Packet, rcode: RCODES) {
   let res = baseResp(query);
-  res.flags! |= rcode;
+  res.flags = (res.flags! & ~0x0400) | rcode;
 
   return res;
 }
