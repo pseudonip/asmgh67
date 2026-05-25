@@ -3,6 +3,7 @@ import "dotenv/config";
 import { ServerEventName } from "@raincloud/types/sse";
 import handle from "./handle";
 import { State } from "./state";
+import { startStats } from "./stats";
 
 const PORT = Number(process.env.PORT) || 5354;
 
@@ -50,6 +51,8 @@ await Bun.udpSocket({
 });
 
 console.log(`DNS server is running on port ${PORT}`);
+
+startStats();
 
 let wait = 1000;
 

@@ -3,9 +3,12 @@ import {
   boolean,
   customType,
   index,
+  integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
+  timestamp,
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
@@ -98,7 +101,18 @@ export const records = pgTable(
   ],
 );
 
+export const queryStats = pgTable("query_stats", {
+  zoneName: text("zone_name").notNull(),
+  bucket: timestamp("bucket", { withTimezone: true, mode: "date" }).notNull(),
+  rcode: text("rcode").notNull(),
+  count: integer("count").notNull().default(0),
+}, (t) => [
+  primaryKey({ columns: [t.zoneName, t.bucket, t.rcode] }),
+  index("query_stats_bucket_idx").on(t.bucket),
+]);
+
 export type User = typeof users.$inferSelect;
+export type ApiKey = typeof apiKeys.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Nameserver = typeof nameservers.$inferSelect;
 export type Zone = typeof zones.$inferSelect;

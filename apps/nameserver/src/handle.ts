@@ -1,5 +1,6 @@
 import { Packet } from "dns-packet";
 import { DnsRecord, State, Zone } from "./state";
+import { recordQuery } from "./stats";
 
 enum RCODES {
   NOERROR = 0,
@@ -12,18 +13,32 @@ enum RCODES {
 
 export default function handle(query: Packet, state: State): Packet {
   const question = query.questions?.[0];
-  if (!question) return errorResp(query, RCODES.FORMERR);
+  if (!question) {
+    recordQuery("unknown", "FORMERR");
+    return errorResp(query, RCODES.FORMERR);
+  }
 
   const qname = question.name.toLowerCase();
   const qtype = question.type.toUpperCase();
 
   const zone = state.findZone(qname);
-  if (!zone) return errorResp(query, RCODES.REFUSED);
+
+  if (!zone) {
+    recordQuery(qname, "REFUSED");
+    return errorResp(query, RCODES.REFUSED);
+  };
 
   const isApex = qname === zone.name;
 
-  if (isApex && qtype === "SOA") return soaResp(query, zone);
-  if (isApex && qtype === "NS") return nsResp(query, zone);
+  if (isApex && qtype === "SOA") {
+    recordQuery(qname, "NOERROR");
+    return soaResp(query, zone);
+  }
+
+  if (isApex && qtype === "NS") {
+    recordQuery(qname, "NOERROR");
+    return nsResp(query, zone);
+  };
 
   let records = state.lookup(zone, qname, qtype);
 
@@ -31,10 +46,17 @@ export default function handle(query: Packet, state: State): Packet {
     records = state.lookup(zone, qname, "CNAME");
   }
 
-  if (records.length > 0) return answerResp(query, zone, records);
+  if (records.length > 0) {
+    recordQuery(qname, "NOERROR");
+    return answerResp(query, zone, records);
+  }
 
-  if (state.hasName(zone, qname)) return emptyResp(query, zone);
+  if (state.hasName(zone, qname)) {
+    recordQuery(qname, "NOERROR");
+    return emptyResp(query, zone)
+  };
 
+  recordQuery(qname, "NXDOMAIN");
   return nxResp(query, zone);
 }
 
@@ -90,6 +112,7 @@ function baseResp(query: Packet): Packet {
 function errorResp(query: Packet, rcode: RCODES) {
   let res = baseResp(query);
   res.flags! |= rcode;
+
   return res;
 }
 
@@ -116,6 +139,7 @@ function emptyResp(query: Packet, zone: Zone): Packet {
 function nxResp(query: Packet, zone: Zone): Packet {
   let res = emptyResp(query, zone);
   res.flags! |= RCODES.NXDOMAIN;
+
   return res;
 }
 
