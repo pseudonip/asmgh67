@@ -1,6 +1,6 @@
 "use server";
 
-import { count, gte, sql } from "drizzle-orm";
+import { count, eq, gte, sql } from "drizzle-orm";
 import { getUser } from "./auth.actions";
 import { db } from "./db";
 import { queryStats, records, users, zones } from "./db/schema";
@@ -106,4 +106,47 @@ export async function getOverview() {
     hourlyPoints,
     hourlyLabels,
   };
+}
+
+export async function getZone(name: string) {
+  await requireAdmin();
+
+  const [zone] = await db.select().from(zones).where(eq(zones.name, name)).execute();
+
+  if (!zone) {
+    throw new Error("Zone not found");
+  }
+
+  const recordsList = await db.select().from(records).where(eq(records.zoneId, zone.id)).execute();
+
+  return {
+    zone,
+    records: recordsList
+  }
+}
+
+export async function adminGetUser(id: string) {
+  await requireAdmin();
+
+  const [user] = await db.select({
+    id: users.id,
+    displayName: users.displayName,
+    email: users.email,
+    isAdmin: users.isAdmin,
+  }).from(users).where(eq(users.id, id)).execute();
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const zonesData = await db.select({
+    id: zones.id,
+    name: zones.name,
+    status: zones.status,
+  }).from(zones).where(eq(zones.userId, id)).execute();
+
+  return {
+    user,
+    zones: zonesData
+  }
 }
