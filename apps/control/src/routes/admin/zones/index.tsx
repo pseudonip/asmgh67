@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { ColumnDef } from "@tanstack/solid-table";
 import { Globe, Plus } from "lucide-solid";
-import { createSignal, onMount } from "solid-js";
+import { createResource } from "solid-js";
 import Table from "~/components/Table";
 import { Button } from "~/components/ui/button";
 import { Zone } from "~/lib/server/db/schema";
@@ -59,11 +59,7 @@ export const columns: ColumnDef<Zone>[] = [
 ];
 
 export default function AdminZones() {
-  const [zones, setZones] = createSignal<Zone[]>([]);
-
-  onMount(async () => {
-    setZones(await getAllZones());
-  });
+  const [zones] = createResource(getAllZones);
 
   return (
     <main class="p-4 flex flex-col h-screen">
@@ -83,7 +79,7 @@ export default function AdminZones() {
 
       <Table
         columns={columns}
-        data={zones()}
+        data={zones() || []}
         noEntriesMessage="No zones found"
       />
     </main>
