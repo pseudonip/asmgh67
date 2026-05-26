@@ -1,8 +1,7 @@
 import { ColumnDef } from "@tanstack/solid-table";
-import { User } from "lucide-solid";
-import { createResource } from "solid-js";
+import { createResource, createSignal } from "solid-js";
 import Table from "~/components/Table";
-import { getAllUsers, getSomeQueryStats } from "~/lib/server/admin.actions";
+import { getRcodeRows } from "~/lib/server/admin.actions";
 import { Zone } from "~/lib/server/db/schema";
 
 export const columns: ColumnDef<Zone>[] = [
@@ -24,21 +23,25 @@ export const columns: ColumnDef<Zone>[] = [
   }
 ];
 
-export default function AdminStatBuckets() {
-  const [stats] = createResource(getSomeQueryStats);
+export default function AdminRcodeStats() {
+  const [rows] = createResource(getRcodeRows);
+  const [category, setCategory] = createSignal<
+    "NOERROR" | "FORMERR" | "SERVFAIL"
+    | "NXDOMAIN" | "NOTIMP" | "REFUSED"
+  >("NOERROR");
 
   return (
     <main class="p-4 flex flex-col h-screen">
       <div class="mb-4">
-        <h1 class="text-2xl ml-1 leading-none font-semibold">Stat Buckets</h1>
+        <h1 class="text-2xl ml-1 leading-none font-semibold">Rcode stats</h1>
         <p class="text-sm text-muted-foreground ml-1 mt-1">
-          Latest buckets from ns logs, not great for stats tbh
+          Latest stats based on dns rcodes
         </p>
       </div>
 
       <Table
         columns={columns}
-        data={stats() || []}
+        data={[]}
         noEntriesMessage="No stats found"
       />
     </main>

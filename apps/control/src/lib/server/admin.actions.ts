@@ -151,10 +151,22 @@ export async function adminGetUser(id: string) {
   }
 }
 
-export async function getSomeQueryStats() {
+export async function getRcodeRows() {
   await requireAdmin();
 
-  const stats = await db.select().from(queryStats).limit(20).execute();
+  const ranked = db
+    .select({
+      ...queryStats,
+      rowNum: sql<number>`ROW_NUMBER() OVER (PARTITION BY ${queryStats.rcode} ORDER BY ${queryStats.bucket} DESC)`.as('rowNum')
+    })
+    .from(queryStats)
+    .as('ranked');
 
-  return stats
+  const rcodeRows = await db
+    .select()
+    .from(ranked)
+    .where(sql`${ranked.rowNum} <= 20`)
+    .execute();
+
+  return rcodeRows
 }

@@ -25,13 +25,10 @@ export default function Table(props: TableProps) {
     get data() {
       return props.data;
     },
-
     get columns() {
       return props.columns;
     },
-
     getCoreRowModel: getCoreRowModel(),
-
     meta: props.meta,
   });
 
@@ -49,7 +46,7 @@ export default function Table(props: TableProps) {
                   {(header) => (
                     <th
                       key={header.id}
-                      class="h-10 px-4 text-left align-middle"
+                      class="h-10 px-4 text-left align-middle max-w-xs"
                     >
                       {header.isPlaceholder
                         ? null
@@ -61,7 +58,6 @@ export default function Table(props: TableProps) {
             )}
           </For>
         </TableHeader>
-
         <TableBody>
           <Show
             when={table.getRowModel().rows?.length}
@@ -83,7 +79,7 @@ export default function Table(props: TableProps) {
                     {(cell) => (
                       <TableCell
                         key={cell.id}
-                        class="transition-colors group-hover:bg-muted/50 px-4"
+                        class="transition-colors group-hover:bg-muted/50 px-4 break-all max-w-xs"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,

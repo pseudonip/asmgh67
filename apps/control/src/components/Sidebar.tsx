@@ -119,10 +119,10 @@ export default function Sidebar(props: SidebarProps) {
       variant: variant((p) => p === "/admin/users"),
     },
     {
-      title: "Stat Buckets",
-      url: "/admin/statsbuckets",
+      title: "Rcode Stats",
+      url: "/admin/rcodeStats",
       icon: ChartArea,
-      variant: variant((p) => p === "/admin/statsbuckets"),
+      variant: variant((p) => p === "/admin/rcodeStats"),
     }
   ];
 
