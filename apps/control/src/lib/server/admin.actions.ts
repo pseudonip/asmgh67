@@ -1,6 +1,11 @@
 "use server";
 
 import { count, eq, gte, sql } from "drizzle-orm";
+
+import { promisify } from "node:util";
+import { execFile } from "node:child_process";
+const execFileAsync = promisify(execFile);
+
 import { getUser } from "./auth.actions";
 import { db } from "./db";
 import { queryStats, records, users, zones } from "./db/schema";
@@ -169,4 +174,16 @@ export async function getRcodeRows() {
     .execute();
 
   return rcodeRows
+}
+
+export async function traceDig(name: string): Promise<string> {
+  await requireAdmin();
+
+  try {
+    const result = await execFileAsync("dig", ["+trace", name]);
+
+    return result.stdout || result.stderr;
+  } catch (error: any) {
+    return error.stdout || error.stderr || error.message;
+  }
 }

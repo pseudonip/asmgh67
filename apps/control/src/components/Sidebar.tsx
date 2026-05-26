@@ -9,7 +9,8 @@ import {
   Server,
   Settings,
   User,
-  ChartArea
+  ChartArea,
+  Shovel
 } from "lucide-solid";
 import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
@@ -123,6 +124,12 @@ export default function Sidebar(props: SidebarProps) {
       url: "/admin/rcodeStats",
       icon: ChartArea,
       variant: variant((p) => p === "/admin/rcodeStats"),
+    },
+    {
+      title: "Dig",
+      url: "/admin/dig",
+      icon: Shovel,
+      variant: variant((p) => p === "/admin/dig"),
     }
   ];
 
