@@ -150,3 +150,11 @@ export async function adminGetUser(id: string) {
     zones: zonesData
   }
 }
+
+export async function getSomeQueryStats() {
+  await requireAdmin();
+
+  const stats = await db.select().from(queryStats).limit(20).execute();
+
+  return stats
+}

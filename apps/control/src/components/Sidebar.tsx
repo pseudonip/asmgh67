@@ -9,6 +9,7 @@ import {
   Server,
   Settings,
   User,
+  ChartArea
 } from "lucide-solid";
 import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
@@ -117,6 +118,12 @@ export default function Sidebar(props: SidebarProps) {
       icon: User,
       variant: variant((p) => p === "/admin/users"),
     },
+    {
+      title: "Stat Buckets",
+      url: "/admin/statsbuckets",
+      icon: ChartArea,
+      variant: variant((p) => p === "/admin/statsbuckets"),
+    }
   ];
 
   async function logout() {
