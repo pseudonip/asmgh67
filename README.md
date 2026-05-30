@@ -1,4 +1,9 @@
 # Raincloud
+A simple authoritive dns server
+
+(admin dash example)
+<img width="1920" height="996" alt="image" src="https://github.com/user-attachments/assets/57e1615a-c2c1-4cbb-b676-4182bb800248" />
+
 
 ## Setup
 
