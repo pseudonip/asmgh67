@@ -1,6 +1,7 @@
 "use server";
 
 import bcrypt from "bcrypt";
+import * as OTPAuth from "otpauth";
 import { randomBytes, createHash } from "crypto";
 import { eq } from "drizzle-orm";
 import { setCookie, getCookie } from "vinxi/http";
@@ -159,4 +160,101 @@ export async function getUser() {
   if (!token) return null;
 
   return getUserFromToken(token);
+}
+
+export async function getLocalsUser(): Promise<
+  { displayName: string; email: string; isAdmin: boolean, mfaEnabled: boolean } | undefined
+> {
+  "use server";
+  const event = getRequestEvent();
+
+  if (!event?.locals.user) {
+    const user = await getUser();
+
+    if (user) {
+      return {
+        displayName: user.displayName,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        mfaEnabled: user.mfaEnabled,
+      };
+    } else {
+      return undefined;
+    }
+  }
+
+  return {
+    displayName: event?.locals.user?.displayName,
+    email: event?.locals.user?.email,
+    isAdmin: event?.locals.user?.isAdmin,
+    mfaEnabled: event?.locals.user?.mfaEnabled,
+  };
+}
+
+export async function setup2FA(password: string) {
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  const passwordValid = await bcrypt.compare(password, user.passwordHash);
+
+  if (!passwordValid) {
+    throw new Error("Password is incorrect");
+  }
+
+  const totp = new OTPAuth.TOTP({
+    issuer: "Raincloud",
+    label: user.email,
+    algorithm: "SHA1",
+    digits: 6,
+    period: 30,
+    secret: new OTPAuth.Secret(),
+  });
+
+  await db.update(users)
+    .set({ mfaSecret: totp.secret.base32 })
+    .where(eq(users.id, user.id))
+    .execute();
+
+  return totp.toString();
+}
+
+export async function first2FAVerify(token: string) {
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  if (!user.mfaSecret) {
+    throw new Error("2FA not set up");
+  }
+
+  const totp = new OTPAuth.TOTP({
+    issuer: "Raincloud",
+    label: user.email,
+    algorithm: "SHA1",
+    digits: 6,
+    period: 30,
+    secret: OTPAuth.Secret.fromBase32(user.mfaSecret),
+  });
+
+  if (!totp.validate({ token, window: 1 })) {
+    throw new Error("Invalid 2FA token");
+  }
+
+  await db.update(users)
+    .set({ mfaEnabled: true })
+    .where(eq(users.id, user.id))
+    .execute();
+}
+
+export async function verify2FA(token: string) {
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
 }

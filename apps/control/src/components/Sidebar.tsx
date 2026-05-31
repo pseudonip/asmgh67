@@ -18,7 +18,7 @@ import DomainSwitcher from "./DomainSwitcher";
 import Nav from "./Nav";
 import { Button } from "./ui/button";
 import { getRequestEvent } from "solid-js/web";
-import { getUser, logout as serverLogout } from "~/lib/server/auth.actions";
+import { getLocalsUser, getUser, logout as serverLogout } from "~/lib/server/auth.actions";
 
 interface SidebarProps {
   domains: string[];
@@ -26,32 +26,7 @@ interface SidebarProps {
   admin?: boolean;
 }
 
-async function getLocalsUser(): Promise<
-  { displayName: string; email: string; isAdmin: boolean } | undefined
-> {
-  "use server";
-  const event = getRequestEvent();
 
-  if (!event?.locals.user) {
-    const user = await getUser();
-
-    if (user) {
-      return {
-        displayName: user.displayName,
-        email: user.email,
-        isAdmin: user.isAdmin,
-      };
-    } else {
-      return undefined;
-    }
-  }
-
-  return {
-    displayName: event?.locals.user?.displayName,
-    email: event?.locals.user?.email,
-    isAdmin: event?.locals.user?.isAdmin,
-  };
-}
 
 export default function Sidebar(props: SidebarProps) {
   const [user] = createResource(getLocalsUser);

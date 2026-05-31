@@ -29,6 +29,10 @@ export const users = pgTable("users", {
   email: citext("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
+
+  mfaEnabled: boolean("mfa_enabled").notNull().default(false),
+  mfaSecret: text("mfa_secret"),
+
 });
 
 export const apiKeys = pgTable("api_keys", {

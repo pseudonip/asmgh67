@@ -5,10 +5,10 @@ A self-hostable authoritative DNS server with a web dashboard and admin panel.
 <img width="1920" height="996" alt="image" src="https://github.com/user-attachments/assets/57e1615a-c2c1-4cbb-b676-4182bb800248" />
 
 ## Todo List
-- [x] Most DNS record types
+- [x] 2FA
+- [x] Most common DNS record types
 - [ ] DNSSEC
 - [ ] API token scoping
-- [ ] 2FA
 - [ ] CNAME flattening
 - [ ] Proper analytics/stats
 
@@ -86,4 +86,4 @@ cd apps/nameserver
 PORT=53 sudo bun start
 ```
 
-For real deployment you will need to set up glue records for your nameservers (for example ns1.example.com and ns2.example.com) with your domain registrars.
+For actual production you will need to set up glue records for your nameservers (for example ns1.example.com and ns2.example.com) with your domain registrars.

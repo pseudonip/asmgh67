@@ -1,3 +1,4 @@
+import { Shield } from "lucide-solid";
 import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {
@@ -40,6 +41,16 @@ export default function SecuritySettings() {
     }
   }
 
+  const [mfaQR, setMfaQR] = createSignal<string | null>(null);
+  const [verifyOtp, setVerifyOtp] = createSignal("");
+  const [mfaError, setMfaError] = createSignal("");
+  const [mfaSuccess, setMfaSuccess] = createSignal("");
+
+  async function enable2FA() {
+    setMfaError("");
+    setMfaSuccess("");
+  }
+
   return (
     <main class="p-4 px-5 flex flex-col flex-1">
       <div class="bg-card border rounded-xl mb-4">
@@ -73,6 +84,24 @@ export default function SecuritySettings() {
 
         <p class="text-sm text-ctp-red px-6">{error()}</p>
         <p class="text-sm text-ctp-green px-6 mb-3">{success()}</p>
+      </div>
+
+      <div class="bg-card border rounded-xl mb-4">
+        <div class="p-4 px-6 border-b">
+          <p class="font-semibold">Two-factor authentication</p>
+          <p class="text-sm text-muted-foreground">We currently only support time-based otp but, we might support more in the future</p>
+        </div>
+
+        <div class="p-4 px-6 flex gap-4">
+          <div class="rounded-lg border bg-muted/25 p-4 flex">
+            <Shield class="bg-muted p-3 rounded-xl" size={42} />
+
+            <div class="ml-4 leading-none my-auto">
+              <p class="font-semibold">Time-based OTP</p>
+              <p class="text-sm text-muted-foreground">Apps like Authy, Google Authenticator, etc</p>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
