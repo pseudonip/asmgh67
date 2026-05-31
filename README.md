@@ -1,32 +1,81 @@
 # Raincloud
-A simple authoritive dns server
 
-(admin dash example)
+A self-hostable authoritative DNS server with a web dashboard and admin panel.
+
 <img width="1920" height="996" alt="image" src="https://github.com/user-attachments/assets/57e1615a-c2c1-4cbb-b676-4182bb800248" />
 
+## Architecture
+
+`apps/control` is the web dashboard and admin panel, along with being the source of truth for zone info and records
+`apps/nameserver` is the actual DNS server that responds to queries, it gets its data from control
+`packages/types` is a package of types that are shared between control and nameserver
+
+## Prerequisites
+- Bun 1.3 or newer
+- PostgreSQL
+- (for production) a domain name where you can set glue records for nameservers, and a minimum of 1 server with a public IP (but ideally 2 servers)
 
 ## Setup
 
-1. Install bun and clone the repo
-2. Run `bun i` to install dependencies
-3. Copy `apps/control/.env.example` to `apps/control/.env` and fill in the required values
-4. To test the dashboard use `bun dev:control`, `bun dev:ns` for nameservers
-5. Register an account and make yourself admin by setting isAdmin to true for your account in the db
-6. On the admin dash create a nameserver and copy and fill `apps/nameservers/.env.example` with the token you get and the other details it wants
-7. For running the dashboard in prod go to `apps/control` and run `bun run build` then `bun .output/server/index.mjs`
-8. For running a nameserver in prod go to `apps/nameservers` and run `PORT=53 sudo bun start`
+Clone and install deps:
 
-## Parts
+```bash
+git clone https://github.com/cyteon/raincloud.git
+cd raincloud
+bun install
+```
 
-### apps/control
+Copy `apps/control/.env.example` to `apps/control/.env` and fill in the DATABASE_URL
 
-The dashboard and source of truth, it sends zone data to the nameservers via sse.
-It's a solidstart app, using drizzle and psql.
+Run migrations:
 
-### apps/nameservers
+```bash
+bun db:migrate
+```
 
-The nameservers are made in bun and connect to the control app via ws to recieve zone updates, and report metrics.
+Start the dashboard in dev:
 
-### packages/types
+```bash
+bun dev:control
+```
 
-Shared types used by both control and nameservers
+Go to `http://localhost:3000` and create an account, then make yourself admin by setting is_admin to true in the database:
+
+```sql
+UPDATE users SET is_admin = true WHERE email = 'you@example.com';
+```
+
+Go to `http://localhost:3000/admin/ns` and create a nameserver, copy down the token thats shown.
+
+Copy `apps/nameserver/.env.example` to `apps/nameserver/.env` and fill out the vales
+
+Start the nameserver:
+
+```bash
+bun dev:ns
+```
+
+Add a zone on the dashboard and add some records, then test it with dig:
+
+```bash
+dig @localhost -p 5354 example.com A
+```
+
+## Production
+
+Build and run the dashboard (you might want to run it with pm2 or systemd), behind a reverse proxy for TLS:
+
+```bash
+cd apps/control
+bun run build
+bun .output/server/index.mjs
+```
+
+Nameserver:
+
+```bash
+cd apps/nameserver
+PORT=53 sudo bun start
+```
+
+For real deployment you will need to set up glue records for your nameservers (for example ns1.example.com and ns2.example.com) with your domain registrars.
