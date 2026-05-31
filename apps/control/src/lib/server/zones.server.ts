@@ -3,6 +3,7 @@ import { resolveNs } from "node:dns/promises";
 
 import { db } from "./db";
 import { nameservers, zones } from "./db/schema";
+import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
 export async function createZoneForUser(userId: string, name: string) {
   const existingZone = await db
@@ -15,13 +16,16 @@ export async function createZoneForUser(userId: string, name: string) {
     throw new Error("This domain is already registered with us");
   }
 
-  await db
+  const [zone] = await db
     .insert(zones)
     .values({
       userId,
       name,
     })
+    .returning({ id: zones.id })
     .execute();
+
+  await sendZoneUpdate(zone.id);
 }
 
 export async function getZoneForUser(userId: string, name: string) {
