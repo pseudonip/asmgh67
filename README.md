@@ -4,6 +4,14 @@ A self-hostable authoritative DNS server with a web dashboard and admin panel.
 
 <img width="1920" height="996" alt="image" src="https://github.com/user-attachments/assets/57e1615a-c2c1-4cbb-b676-4182bb800248" />
 
+## Todo List
+- [x] Most DNS record types
+- [ ] DNSSEC
+- [ ] API token scoping
+- [ ] 2FA
+- [ ] CNAME flattening
+- [ ] Proper analytics/stats
+
 ## Architecture
 
 `apps/control` is the web dashboard and admin panel, along with being the source of truth for zone info and records
