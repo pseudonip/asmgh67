@@ -17,7 +17,6 @@ import { cn } from "~/lib/utils";
 import DomainSwitcher from "./DomainSwitcher";
 import Nav from "./Nav";
 import { Button } from "./ui/button";
-import { getRequestEvent } from "solid-js/web";
 import { getLocalsUser, getUser, logout as serverLogout } from "~/lib/server/auth.actions";
 
 interface SidebarProps {

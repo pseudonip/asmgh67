@@ -191,7 +191,7 @@ export async function getLocalsUser(): Promise<
   };
 }
 
-export async function setup2FA(password: string) {
+export async function setup2FA(password: string): Promise<{ url: string; base32: string }> {
   const user = await getUser();
 
   if (!user) {
@@ -218,7 +218,10 @@ export async function setup2FA(password: string) {
     .where(eq(users.id, user.id))
     .execute();
 
-  return totp.toString();
+  return {
+    url: totp.toString(),
+    base32: totp.secret.base32,
+  }
 }
 
 export async function first2FAVerify(token: string) {
@@ -241,7 +244,7 @@ export async function first2FAVerify(token: string) {
     secret: OTPAuth.Secret.fromBase32(user.mfaSecret),
   });
 
-  if (!totp.validate({ token, window: 1 })) {
+  if (totp.validate({ token, window: 1 }) === null) {
     throw new Error("Invalid 2FA token");
   }
 
@@ -256,5 +259,22 @@ export async function verify2FA(token: string) {
 
   if (!user) {
     throw new Error("Not authenticated");
+  }
+
+  if (!user.mfaEnabled || !user.mfaSecret) {
+    throw new Error("2FA not set up");
+  }
+
+  const totp = new OTPAuth.TOTP({
+    issuer: "Raincloud",
+    label: user.email,
+    algorithm: "SHA1",
+    digits: 6,
+    period: 30,
+    secret: OTPAuth.Secret.fromBase32(user.mfaSecret),
+  });
+
+  if (totp.validate({ token, window: 1 }) === null) {
+    throw new Error("Invalid 2FA token");
   }
 }
