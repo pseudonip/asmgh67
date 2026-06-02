@@ -3,11 +3,14 @@ import { createHash } from "crypto";
 import { db } from "./db";
 import { sessions, User, users } from "./db/schema";
 
-export async function getUserFromToken(token: string): Promise<User | null> {
+export async function getUserFromToken(token: string): Promise<{
+  user: User | null;
+  mfaRequired: boolean;
+}> {
   const sha256 = createHash("sha256").update(token).digest();
 
   const [session] = await db
-    .select({ user: users })
+    .select({ user: users, active: sessions.active })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
     .where(
@@ -18,7 +21,20 @@ export async function getUserFromToken(token: string): Promise<User | null> {
     )
     .execute();
 
-  if (!session) return null;
+  if (!session) return {
+    user: null,
+    mfaRequired: false,
+  };
 
-  return session.user;
+  if (session.user.mfaEnabled && !session.active) {
+    return {
+      user: session.user,
+      mfaRequired: true,
+    };
+  }
+
+  return {
+    user: session.user,
+    mfaRequired: false,
+  }
 }

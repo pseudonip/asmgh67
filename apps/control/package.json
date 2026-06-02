@@ -11,6 +11,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@corvu/otp-field": "^0.1.4",
     "@kobalte/core": "^0.13.11",
     "@raincloud/types": "workspace:*",
     "@solidjs/meta": "^0.29.4",

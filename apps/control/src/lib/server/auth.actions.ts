@@ -63,7 +63,7 @@ export async function register({
   });
 }
 
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string): Promise<{ mfaRequired: boolean }> {
   const [user] = await db
     .select()
     .from(users)
@@ -86,6 +86,7 @@ export async function login(email: string, password: string) {
   await db.insert(sessions).values({
     userId: user.id,
     tokenHash: sha256,
+    active: !user.mfaEnabled,
     expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week
   });
 
@@ -95,6 +96,8 @@ export async function login(email: string, password: string) {
     sameSite: "strict",
     maxAge: 60 * 60 * 24 * 7, // 1 week
   });
+
+  return { mfaRequired: user.mfaEnabled };
 }
 
 export async function logout() {
@@ -145,7 +148,7 @@ export async function changePassword(oldPassword: string, newPassword: string) {
     .execute();
 }
 
-export async function getUser() {
+export async function getUser(includeNotVerified = false) {
   const req = getRequestEvent()?.request;
 
   let token;
@@ -159,7 +162,13 @@ export async function getUser() {
 
   if (!token) return null;
 
-  return getUserFromToken(token);
+  const result = await getUserFromToken(token);
+
+  if (!includeNotVerified && result.mfaRequired) {
+    return null;
+  }
+
+  return result.user;
 }
 
 export async function getLocalsUser(): Promise<
@@ -255,7 +264,7 @@ export async function first2FAVerify(token: string) {
 }
 
 export async function verify2FA(token: string) {
-  const user = await getUser();
+  const user = await getUser(true);
 
   if (!user) {
     throw new Error("Not authenticated");
@@ -277,4 +286,26 @@ export async function verify2FA(token: string) {
   if (totp.validate({ token, window: 1 }) === null) {
     throw new Error("Invalid 2FA token");
   }
+
+  const req = getRequestEvent()?.request;
+
+  let tokenValue;
+
+  try {
+    tokenValue = getCookie("token");
+  } catch {
+    const cookieHeader = req?.headers.get("cookie") ?? "";
+    tokenValue = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
+  }
+
+  if (!tokenValue) {
+    throw new Error("Session token not found");
+  }
+
+  const sha256 = createHash("sha256").update(tokenValue).digest();
+
+  await db.update(sessions)
+    .set({ active: true })
+    .where(eq(sessions.tokenHash, sha256))
+    .execute();
 }

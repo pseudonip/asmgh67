@@ -32,8 +32,13 @@ export default function Login() {
     }
 
     try {
-      await serverLogin(email(), password());
-      navigate("/app");
+      const { mfaRequired } = await serverLogin(email(), password());
+
+      if (mfaRequired) {
+        navigate("/login/2fa");
+      } else {
+        navigate("/app");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred.",

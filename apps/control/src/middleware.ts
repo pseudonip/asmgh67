@@ -16,21 +16,30 @@ export default createMiddleware({
     const cookieHeader = event.request.headers.get("cookie") ?? "";
     const token = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
 
-    let user = token ? await getUserFromToken(token) : null;
-    delete user?.passwordHash;
-    event.locals.user = user;
+    let result = token ? await getUserFromToken(token) : null;
 
-    if (url.pathname.startsWith("/app") && !user) {
-      return redirect("/login");
-    }
+    if (result?.mfaRequired) {
+      if (!url.pathname.startsWith("/login/2fa")) {
+        return redirect("/login/2fa");
+      }
+    } else {
+      const user = result?.user ?? null;
 
-    if (url.pathname.startsWith("/admin")) {
-      if (!user) return redirect("/login");
-      if (!user.isAdmin) return redirect("/app");
-    }
+      delete user?.passwordHash;
+      event.locals.user = user;
 
-    if (url.pathname.startsWith("/login") && user) {
-      return redirect("/app");
+      if (url.pathname.startsWith("/app") && !user) {
+        return redirect("/login");
+      }
+
+      if (url.pathname.startsWith("/admin")) {
+        if (!user) return redirect("/login");
+        if (!user.isAdmin) return redirect("/app");
+      }
+
+      if (url.pathname.startsWith("/login") && user) {
+        return redirect("/app");
+      }
     }
   },
 });
