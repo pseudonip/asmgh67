@@ -86,7 +86,6 @@ export async function login(email: string, password: string): Promise<{ mfaRequi
   await db.insert(sessions).values({
     userId: user.id,
     tokenHash: sha256,
-    active: !user.mfaEnabled,
     expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week
   });
 
@@ -305,7 +304,7 @@ export async function verify2FA(token: string) {
   const sha256 = createHash("sha256").update(tokenValue).digest();
 
   await db.update(sessions)
-    .set({ active: true })
+    .set({ mfa_verified: true })
     .where(eq(sessions.tokenHash, sha256))
     .execute();
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "sessions" RENAME COLUMN "active" TO "mfa_verified";

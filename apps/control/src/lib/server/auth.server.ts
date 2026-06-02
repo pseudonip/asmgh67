@@ -10,7 +10,7 @@ export async function getUserFromToken(token: string): Promise<{
   const sha256 = createHash("sha256").update(token).digest();
 
   const [session] = await db
-    .select({ user: users, active: sessions.active })
+    .select({ user: users, mfa_verified: sessions.mfa_verified })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
     .where(
@@ -26,7 +26,7 @@ export async function getUserFromToken(token: string): Promise<{
     mfaRequired: false,
   };
 
-  if (session.user.mfaEnabled && !session.active) {
+  if (session.user.mfaEnabled && !session.mfa_verified) {
     return {
       user: session.user,
       mfaRequired: true,

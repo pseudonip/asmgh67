@@ -52,7 +52,7 @@ export const sessions = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     tokenHash: bytea("token_hash").notNull().unique(),
-    mfa_verified: boolean("active").notNull().default(false), // only required to be true if 2fa enabled
+    mfa_verified: boolean("mfa_verified").notNull().default(false), // only required to be true if 2fa enabled
     expires_at: text("expires_at").notNull(),
   },
   (t) => [

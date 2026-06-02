@@ -34,6 +34,23 @@ export const columns: ColumnDef<Zone>[] = [
     accessorKey: "email",
     header: "Email",
   },
+  {
+    accessorKey: "mfaEnabled",
+    header: "2FA Status",
+    cell: (info) => {
+      const enabled = info.getValue();
+
+      return enabled ? (
+        <span class="text-xs text-ctp-green p-1 px-3 rounded-full bg-ctp-green/10">
+          Enabled
+        </span>
+      ) : (
+        <span class="text-xs text-ctp-yellow p-1 px-3 rounded-full bg-ctp-yellow/10">
+          Disabled
+        </span>
+      );
+    }
+  }
 ];
 
 export default function AdminZones() {
