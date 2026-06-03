@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/solid-table";
 import { Key, Trash } from "lucide-solid";
 import { createResource, createSignal, For, Show } from "solid-js";
-import Table from "~/components/Table";
 import { Button } from "~/components/ui/button";
 import {
   TextField,
@@ -13,38 +12,6 @@ import {
   deleteApiKey,
   getApiKeys,
 } from "~/lib/server/api.actions";
-
-const columns: ColumnDef<{ name: string }>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    id: "actions",
-    header: "",
-    cell: (info) => {
-      const apiKey = info.row.original;
-
-      return (
-        <div class="flex gap-2 justify-end">
-          <button
-            onClick={async () => {
-              try {
-                //await deleteRecord(record.id);
-                //info.table.options.meta?.deleteRecord(record.id);
-              } catch (e) {
-                console.error("Failed to delete api key:", e);
-              }
-            }}
-            class="hover:text-ctp-red transition-all duration-300"
-          >
-            <Trash size={16} />
-          </button>
-        </div>
-      );
-    },
-  },
-];
 
 export default function APISettings() {
   const [keys, { mutate: setKeys }] = createResource(getApiKeys);

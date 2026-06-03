@@ -144,7 +144,7 @@ export default function SecuritySettings() {
             </p>
           </div>
 
-          <div class="p-4 px-6 flex gap-4">
+          <div class="p-4 flex gap-4">
             <div class="rounded-lg border bg-muted/25 p-4 flex w-full">
               <Shield class="bg-muted p-3 rounded-xl my-auto" size={42} />
 

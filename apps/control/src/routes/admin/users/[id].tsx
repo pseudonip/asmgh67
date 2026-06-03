@@ -3,8 +3,8 @@ import { ColumnDef } from "@tanstack/solid-table";
 import { Globe } from "lucide-solid";
 import { createResource } from "solid-js";
 import Table from "~/components/Table";
-import { adminGetUser, getZone } from "~/lib/server/admin.actions";
-import { Record, Zone } from "~/lib/server/db/schema";
+import { adminGetUser } from "~/lib/server/admin.actions";
+import { Zone } from "~/lib/server/db/schema";
 
 export const columns: ColumnDef<Zone>[] = [
   {
