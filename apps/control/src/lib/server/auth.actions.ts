@@ -148,8 +148,6 @@ export async function changePassword(oldPassword: string, newPassword: string) {
     .where(eq(users.id, user.id))
     .execute();
 
-  // delete all other sessions
-
   const req = getRequestEvent()?.request;
 
   let token;
