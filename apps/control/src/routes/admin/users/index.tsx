@@ -49,8 +49,8 @@ export const columns: ColumnDef<Zone>[] = [
           Disabled
         </span>
       );
-    }
-  }
+    },
+  },
 ];
 
 export default function AdminZones() {

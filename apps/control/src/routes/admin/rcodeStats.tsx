@@ -27,14 +27,13 @@ export const columns: ColumnDef<Zone>[] = [
   {
     accessorKey: "count",
     header: "Count",
-  }
+  },
 ];
 
 export default function AdminRcodeStats() {
   const [rows] = createResource(getRcodeRows);
   const [category, setCategory] = createSignal<
-    "NOERROR" | "FORMERR" | "SERVFAIL"
-    | "NXDOMAIN" | "NOTIMP" | "REFUSED"
+    "NOERROR" | "FORMERR" | "SERVFAIL" | "NXDOMAIN" | "NOTIMP" | "REFUSED"
   >("NOERROR");
 
   return (
@@ -57,7 +56,7 @@ export default function AdminRcodeStats() {
               "SERVFAIL",
               "NXDOMAIN",
               "NOTIMP",
-              "REFUSED"
+              "REFUSED",
             ]}
             class="mt-1"
             itemComponent={(itemProps) => (

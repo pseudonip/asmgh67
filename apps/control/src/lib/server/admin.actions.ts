@@ -84,22 +84,22 @@ export async function getOverview() {
     .orderBy(sql`date_trunc('hour', ${queryStats.bucket})`);
 
   const hourlyMap = new Map<number, number>(
-    hourlyRows.map((r) => [new Date(r.hour).getTime(), r.total])
+    hourlyRows.map((r) => [new Date(r.hour).getTime(), r.total]),
   );
 
   for (let i = 0; i < 24; i++) {
-    const d = new Date(start)
-    d.setHours(start.getHours() + i)
-    d.setMinutes(0, 0, 0)
+    const d = new Date(start);
+    d.setHours(start.getHours() + i);
+    d.setMinutes(0, 0, 0);
 
     hourlyLabels.push(
       d.toLocaleTimeString([], {
         hour: "numeric",
-        hour12: true
-      })
-    )
+        hour12: true,
+      }),
+    );
 
-    hourlyPoints.push(hourlyMap.get(d.getTime()) ?? 0)
+    hourlyPoints.push(hourlyMap.get(d.getTime()) ?? 0);
   }
 
   return {
@@ -116,44 +116,60 @@ export async function getOverview() {
 export async function getZone(name: string) {
   await requireAdmin();
 
-  const [zone] = await db.select().from(zones).where(eq(zones.name, name)).execute();
+  const [zone] = await db
+    .select()
+    .from(zones)
+    .where(eq(zones.name, name))
+    .execute();
 
   if (!zone) {
     throw new Error("Zone not found");
   }
 
-  const recordsList = await db.select().from(records).where(eq(records.zoneId, zone.id)).execute();
+  const recordsList = await db
+    .select()
+    .from(records)
+    .where(eq(records.zoneId, zone.id))
+    .execute();
 
   return {
     zone,
-    records: recordsList
-  }
+    records: recordsList,
+  };
 }
 
 export async function adminGetUser(id: string) {
   await requireAdmin();
 
-  const [user] = await db.select({
-    id: users.id,
-    displayName: users.displayName,
-    email: users.email,
-    isAdmin: users.isAdmin,
-  }).from(users).where(eq(users.id, id)).execute();
+  const [user] = await db
+    .select({
+      id: users.id,
+      displayName: users.displayName,
+      email: users.email,
+      isAdmin: users.isAdmin,
+    })
+    .from(users)
+    .where(eq(users.id, id))
+    .execute();
 
   if (!user) {
     throw new Error("User not found");
   }
 
-  const zonesData = await db.select({
-    id: zones.id,
-    name: zones.name,
-    status: zones.status,
-  }).from(zones).where(eq(zones.userId, id)).execute();
+  const zonesData = await db
+    .select({
+      id: zones.id,
+      name: zones.name,
+      status: zones.status,
+    })
+    .from(zones)
+    .where(eq(zones.userId, id))
+    .execute();
 
   return {
     user,
-    zones: zonesData
-  }
+    zones: zonesData,
+  };
 }
 
 export async function getRcodeRows() {
@@ -162,10 +178,13 @@ export async function getRcodeRows() {
   const ranked = db
     .select({
       ...queryStats,
-      rowNum: sql<number>`ROW_NUMBER() OVER (PARTITION BY ${queryStats.rcode} ORDER BY ${queryStats.bucket} DESC)`.as('rowNum')
+      rowNum:
+        sql<number>`ROW_NUMBER() OVER (PARTITION BY ${queryStats.rcode} ORDER BY ${queryStats.bucket} DESC)`.as(
+          "rowNum",
+        ),
     })
     .from(queryStats)
-    .as('ranked');
+    .as("ranked");
 
   const rcodeRows = await db
     .select()
@@ -173,7 +192,7 @@ export async function getRcodeRows() {
     .where(sql`${ranked.rowNum} <= 20`)
     .execute();
 
-  return rcodeRows
+  return rcodeRows;
 }
 
 export async function traceDig(name: string): Promise<string> {

@@ -1,17 +1,17 @@
-import type { Component } from "solid-js"
+import type { Component } from "solid-js";
 import {
   createEffect,
   createSignal,
   mergeProps,
   on,
   onCleanup,
-  onMount
-} from "solid-js"
+  onMount,
+} from "solid-js";
 
-import { unwrap } from "solid-js/store"
+import { unwrap } from "solid-js/store";
 
-import type { Ref } from "@solid-primitives/refs"
-import { mergeRefs } from "@solid-primitives/refs"
+import type { Ref } from "@solid-primitives/refs";
+import { mergeRefs } from "@solid-primitives/refs";
 
 import type {
   ChartComponent,
@@ -21,8 +21,8 @@ import type {
   Plugin as ChartPlugin,
   ChartType,
   ChartTypeRegistry,
-  TooltipModel
-} from "chart.js"
+  TooltipModel,
+} from "chart.js";
 
 import {
   ArcElement,
@@ -43,52 +43,52 @@ import {
   RadarController,
   RadialLinearScale,
   ScatterController,
-  Tooltip
-} from "chart.js"
+  Tooltip,
+} from "chart.js";
 
 type TypedChartProps = {
-  data: ChartData
-  options?: ChartOptions
-  plugins?: ChartPlugin[]
-  ref?: Ref<HTMLCanvasElement | null>
-  width?: number
-  height?: number
-}
+  data: ChartData;
+  options?: ChartOptions;
+  plugins?: ChartPlugin[];
+  ref?: Ref<HTMLCanvasElement | null>;
+  width?: number;
+  height?: number;
+};
 
 type ChartProps = TypedChartProps & {
-  type: ChartType
-}
+  type: ChartType;
+};
 
 type ChartContext = {
-  chart: Chart
-  tooltip: TooltipModel<keyof ChartTypeRegistry>
-}
+  chart: Chart;
+  tooltip: TooltipModel<keyof ChartTypeRegistry>;
+};
 
 function cssVar(name: string, fallback = "") {
-  if (typeof window === "undefined") return fallback
+  if (typeof window === "undefined") return fallback;
   return getComputedStyle(document.documentElement)
     .getPropertyValue(name)
-    .trim()
+    .trim();
 }
 
 function alpha(color: string, opacity: number) {
-  return `color-mix(in srgb, ${color} ${opacity * 100}%, transparent)`
+  return `color-mix(in srgb, ${color} ${opacity * 100}%, transparent)`;
 }
 
 function getPrimary() {
-  return cssVar("--primary")
+  return cssVar("--primary");
 }
 
 function getBorder() {
-  return cssVar("--border")
+  return cssVar("--border");
 }
 
 function getMuted() {
-  return cssVar("--muted-foreground")
+  return cssVar("--muted-foreground");
 }
 
 function themedData(data: ChartData): ChartData {
-  const primary = getPrimary()
+  const primary = getPrimary();
 
   return {
     ...data,
@@ -111,101 +111,98 @@ function themedData(data: ChartData): ChartData {
         pointRadius: 4,
         pointHoverRadius: 6,
 
-        fill: true
-      }
-    })
-  }
+        fill: true,
+      };
+    }),
+  };
 }
 
 const BaseChart: Component<ChartProps> = (rawProps) => {
-  const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | null>()
-  const [chart, setChart] = createSignal<Chart>()
+  const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | null>();
+  const [chart, setChart] = createSignal<Chart>();
 
   const props = mergeProps(
     {
       width: 512,
       height: 512,
       options: { responsive: true } as ChartOptions,
-      plugins: [] as ChartPlugin[]
+      plugins: [] as ChartPlugin[],
     },
-    rawProps
-  )
+    rawProps,
+  );
 
   const init = () => {
-    const ctx = canvasRef()?.getContext("2d")
-    if (!ctx) return
+    const ctx = canvasRef()?.getContext("2d");
+    if (!ctx) return;
 
-    const config = unwrap(props)
+    const config = unwrap(props);
 
     const instance = new Chart(ctx as ChartItem, {
       type: config.type,
       data: themedData(config.data),
       options: config.options,
-      plugins: config.plugins
-    })
+      plugins: config.plugins,
+    });
 
-    setChart(instance)
-  }
+    setChart(instance);
+  };
 
-  onMount(() => init())
+  onMount(() => init());
 
   createEffect(
     on(
       () => props.data,
       () => {
-        const instance = chart()
-        if (!instance) return
-        instance.data = themedData(props.data)
-        instance.update()
-      }
-    )
-  )
+        const instance = chart();
+        if (!instance) return;
+        instance.data = themedData(props.data);
+        instance.update();
+      },
+    ),
+  );
 
   createEffect(
     on(
       () => props.options,
       () => {
-        const instance = chart()
-        if (!instance) return
-        instance.options = props.options
-        instance.update()
-      }
-    )
-  )
+        const instance = chart();
+        if (!instance) return;
+        instance.options = props.options;
+        instance.update();
+      },
+    ),
+  );
 
   createEffect(
-    on(
-      [() => props.width, () => props.height],
-      () => {
-        const instance = chart()
-        if (!instance) return
-        instance.resize(props.width, props.height)
-      }
-    )
-  )
+    on([() => props.width, () => props.height], () => {
+      const instance = chart();
+      if (!instance) return;
+      instance.resize(props.width, props.height);
+    }),
+  );
 
   createEffect(
     on(
       () => props.type,
       () => {
-        const instance = chart()
-        if (!instance) return
+        const instance = chart();
+        if (!instance) return;
 
-        const dims = [instance.width, instance.height]
+        const dims = [instance.width, instance.height];
 
-        instance.destroy()
-        init()
-        chart()?.resize(...dims)
-      }
-    )
-  )
+        instance.destroy();
+        init();
+        chart()?.resize(...dims);
+      },
+    ),
+  );
 
   onCleanup(() => {
-    chart()?.destroy()
-    mergeRefs(props.ref, null)
-  })
+    chart()?.destroy();
+    mergeRefs(props.ref, null);
+  });
 
-  Chart.register(Filler, Legend, Tooltip)
+  Chart.register(Filler, Legend, Tooltip);
 
   return (
     <canvas
@@ -213,61 +210,61 @@ const BaseChart: Component<ChartProps> = (rawProps) => {
       width={props.width}
       height={props.height}
     />
-  )
-}
+  );
+};
 
 function showTooltip(context: ChartContext) {
-  let el = document.getElementById("chartjs-tooltip")
+  let el = document.getElementById("chartjs-tooltip");
 
   if (!el) {
-    el = document.createElement("div")
-    el.id = "chartjs-tooltip"
-    el.className = "chart-tooltip"
-    document.body.appendChild(el)
+    el = document.createElement("div");
+    el.id = "chartjs-tooltip";
+    el.className = "chart-tooltip";
+    document.body.appendChild(el);
   }
 
-  const model = context.tooltip
+  const model = context.tooltip;
 
   if (model.opacity === 0 || !model.body) {
-    el.style.opacity = "0"
-    return
+    el.style.opacity = "0";
+    return;
   }
 
-  let html = ""
+  let html = "";
 
   model.title.forEach((title) => {
-    html += `<div style="font-weight:600;margin-bottom:4px;">${title}</div>`
-  })
+    html += `<div style="font-weight:600;margin-bottom:4px;">${title}</div>`;
+  });
 
-  const body = model.body.flatMap((b) => b.lines)
+  const body = model.body.flatMap((b) => b.lines);
 
   body.forEach((line, i) => {
-    const colors = model.labelColors[i]
+    const colors = model.labelColors[i];
 
     html += `
       <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
         <span style="width:8px;height:8px;border-radius:9999px;background:${colors.backgroundColor};border:1px solid ${colors.borderColor};"></span>
         ${line}
       </div>
-    `
-  })
+    `;
+  });
 
-  el.innerHTML = html
+  el.innerHTML = html;
 
-  const pos = context.chart.canvas.getBoundingClientRect()
+  const pos = context.chart.canvas.getBoundingClientRect();
 
-  el.style.opacity = "1"
-  el.style.position = "absolute"
-  el.style.left = `${pos.left + window.scrollX + model.caretX}px`
-  el.style.top = `${pos.top + window.scrollY + model.caretY}px`
-  el.style.pointerEvents = "none"
+  el.style.opacity = "1";
+  el.style.position = "absolute";
+  el.style.left = `${pos.left + window.scrollX + model.caretX}px`;
+  el.style.top = `${pos.top + window.scrollY + model.caretY}px`;
+  el.style.pointerEvents = "none";
 }
 
 function createTypedChart(
   type: ChartType,
-  components: ChartComponent[]
+  components: ChartComponent[],
 ): Component<TypedChartProps> {
-  Chart.register(...components)
+  Chart.register(...components);
 
   return (props) => {
     const options: ChartOptions = {
@@ -278,29 +275,29 @@ function createTypedChart(
         ? {
             x: {
               grid: {
-                display: false
+                display: false,
               },
               border: {
-                display: false
+                display: false,
               },
               ticks: {
-                color: getMuted()
-              }
+                color: getMuted(),
+              },
             },
 
             y: {
               grid: {
-                color: alpha(getBorder(), 0.25)
+                color: alpha(getBorder(), 0.25),
               },
 
               border: {
-                display: false
+                display: false,
               },
 
               ticks: {
-                color: getMuted()
-              }
-            }
+                color: getMuted(),
+              },
+            },
           }
         : {},
 
@@ -313,71 +310,68 @@ function createTypedChart(
                 usePointStyle: true,
                 boxWidth: 6,
                 boxHeight: 6,
-                color: getMuted()
-              }
+                color: getMuted(),
+              },
             }
           : { display: false },
 
         tooltip: {
           enabled: false,
-          external: (ctx) => showTooltip(ctx as ChartContext)
-        }
-      }
-    }
+          external: (ctx) => showTooltip(ctx as ChartContext),
+        },
+      },
+    };
 
-    return <BaseChart type={type} options={options} {...props} />
-  }
+    return <BaseChart type={type} options={options} {...props} />;
+  };
 }
 
 const BarChart = createTypedChart("bar", [
   BarController,
   BarElement,
   CategoryScale,
-  LinearScale
-])
+  LinearScale,
+]);
 
 const BubbleChart = createTypedChart("bubble", [
   BubbleController,
   PointElement,
-  LinearScale
-])
+  LinearScale,
+]);
 
 const DonutChart = createTypedChart("doughnut", [
   DoughnutController,
-  ArcElement
-])
+  ArcElement,
+]);
 
 const LineChart = createTypedChart("line", [
   LineController,
   LineElement,
   PointElement,
   CategoryScale,
-  LinearScale
-])
+  LinearScale,
+]);
 
-const PieChart = createTypedChart("pie", [
-  PieController,
-  ArcElement
-])
+const PieChart = createTypedChart("pie", [PieController, ArcElement]);
 
 const PolarAreaChart = createTypedChart("polarArea", [
   PolarAreaController,
   ArcElement,
-  RadialLinearScale
-])
+  RadialLinearScale,
+]);
 
 const RadarChart = createTypedChart("radar", [
   RadarController,
   LineElement,
   PointElement,
-  RadialLinearScale
-])
+  RadialLinearScale,
+]);
 
 const ScatterChart = createTypedChart("scatter", [
   ScatterController,
   PointElement,
-  LinearScale
-])
+  LinearScale,
+]);
 
 export {
   BaseChart as Chart,
@@ -388,5 +382,5 @@ export {
   PieChart,
   PolarAreaChart,
   RadarChart,
-  ScatterChart
-}
+  ScatterChart,
+};

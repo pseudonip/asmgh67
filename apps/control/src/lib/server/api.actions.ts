@@ -35,7 +35,9 @@ export async function createApiKey(
   };
 }
 
-export async function getApiKeys(): Promise<{ id: string; name: string, tokenStart: string }[]> {
+export async function getApiKeys(): Promise<
+  { id: string; name: string; tokenStart: string }[]
+> {
   const user = await getUser();
 
   if (!user) {
@@ -51,7 +53,7 @@ export async function getApiKeys(): Promise<{ id: string; name: string, tokenSta
   return keys.map((key) => ({
     id: key.id,
     name: key.name,
-    tokenStart: key.tokenStart ?? ""
+    tokenStart: key.tokenStart ?? "",
   }));
 }
 

@@ -1,14 +1,25 @@
 import { Shield } from "lucide-solid";
 import { createResource, createSignal, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import {
   TextField,
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
 import QRCode from "qrcode";
-import { changePassword, first2FAVerify, getLocalsUser, setup2FA } from "~/lib/server/auth.actions";
+import {
+  changePassword,
+  first2FAVerify,
+  getLocalsUser,
+  setup2FA,
+} from "~/lib/server/auth.actions";
 
 export default function SecuritySettings() {
   const [user, { mutate: mutateUser }] = createResource(getLocalsUser);
@@ -62,7 +73,11 @@ export default function SecuritySettings() {
     } catch (e) {
       console.error("Failed to setup 2FA:", e);
 
-      alert(e instanceof Error ? e.message : "An error occurred while setting up 2FA.");
+      alert(
+        e instanceof Error
+          ? e.message
+          : "An error occurred while setting up 2FA.",
+      );
 
       setDialogOpen(false);
     }
@@ -73,10 +88,14 @@ export default function SecuritySettings() {
       await first2FAVerify(verifyOtp());
 
       setDialogOpen(false);
-      mutateUser((prev) => prev ? { ...prev, mfaEnabled: true } : prev);
+      mutateUser((prev) => (prev ? { ...prev, mfaEnabled: true } : prev));
     } catch (e) {
       console.error("Failed to verify 2FA:", e);
-      setMfaVerifError(e instanceof Error ? e.message : "An error occurred while verifying 2FA.");
+      setMfaVerifError(
+        e instanceof Error
+          ? e.message
+          : "An error occurred while verifying 2FA.",
+      );
     }
   }
 
@@ -119,7 +138,10 @@ export default function SecuritySettings() {
         <div class="bg-card border rounded-xl mb-4">
           <div class="p-4 px-6 border-b">
             <p class="font-semibold">Two-factor authentication</p>
-            <p class="text-sm text-muted-foreground">We currently only support time-based otp but, we might support more in the future</p>
+            <p class="text-sm text-muted-foreground">
+              We currently only support time-based otp but, we might support
+              more in the future
+            </p>
           </div>
 
           <div class="p-4 px-6 flex gap-4">
@@ -132,26 +154,43 @@ export default function SecuritySettings() {
                   <Show
                     when={user()?.mfaEnabled}
                     fallback={
-                      <span class="text-[12px] text-ctp-yellow p-1 px-2 rounded-full bg-ctp-yellow/10 ml-2">Disabled</span>
+                      <span class="text-[12px] text-ctp-yellow p-1 px-2 rounded-full bg-ctp-yellow/10 ml-2">
+                        Disabled
+                      </span>
                     }
                   >
-                    <span class="text-[12px] text-ctp-green p-1 px-2 rounded-full bg-ctp-green/10 ml-2">Enabled</span>
+                    <span class="text-[12px] text-ctp-green p-1 px-2 rounded-full bg-ctp-green/10 ml-2">
+                      Enabled
+                    </span>
                   </Show>
                 </div>
-                <p class="text-sm text-muted-foreground">Apps like Authy, Google Authenticator, etc</p>
+                <p class="text-sm text-muted-foreground">
+                  Apps like Authy, Google Authenticator, etc
+                </p>
               </div>
 
               <Show when={!user()?.mfaEnabled}>
                 <TextField class="ml-auto my-auto">
                   <TextFieldLabel>Password</TextFieldLabel>
-                  <TextFieldInput type="password" value={mfaVerifPassword()} onInput={(e) => {
-                    setMfaVerifPassword(e.currentTarget.value);
+                  <TextFieldInput
+                    type="password"
+                    value={mfaVerifPassword()}
+                    onInput={(e) => {
+                      setMfaVerifPassword(e.currentTarget.value);
 
-                    document.getElementById("2fa-btn")!.disabled = !e.currentTarget.value;
-                  }} />
+                      document.getElementById("2fa-btn")!.disabled =
+                        !e.currentTarget.value;
+                    }}
+                  />
                 </TextField>
 
-                <Button onClick={enable2FA} class="ml-2 self-end" variant="outline" disabled id="2fa-btn">
+                <Button
+                  onClick={enable2FA}
+                  class="ml-2 self-end"
+                  variant="outline"
+                  disabled
+                  id="2fa-btn"
+                >
                   <Shield size={16} class="mr-2" />
                   <p class="mb-px leading-none">Enable</p>
                 </Button>
@@ -166,7 +205,8 @@ export default function SecuritySettings() {
           <DialogHeader>
             <DialogTitle>Enable 2FA</DialogTitle>
             <DialogDescription>
-              Scan the QR code with your authenticator app and enter the generated code to enable 2FA
+              Scan the QR code with your authenticator app and enter the
+              generated code to enable 2FA
             </DialogDescription>
           </DialogHeader>
 
@@ -178,7 +218,9 @@ export default function SecuritySettings() {
             </Show>
 
             <Show when={mfaBase32()}>
-              <p class="text-sm mt-2 text-muted-foreground mb-1">Or add it manually:</p>
+              <p class="text-sm mt-2 text-muted-foreground mb-1">
+                Or add it manually:
+              </p>
               <div class="bg-card border rounded-lg p-2 px-4 font-mono!">
                 {mfaBase32()}
               </div>
@@ -186,12 +228,21 @@ export default function SecuritySettings() {
 
             <TextField class="mt-6">
               <TextFieldLabel>Generated code</TextFieldLabel>
-              <TextFieldInput value={verifyOtp()} onInput={(e) => setVerifyOtp(e.currentTarget.value)} placeholder="123456" />
+              <TextFieldInput
+                value={verifyOtp()}
+                onInput={(e) => setVerifyOtp(e.currentTarget.value)}
+                placeholder="123456"
+              />
             </TextField>
 
             <p class="text-sm text-ctp-red mt-3">{mfaVerifError()}</p>
 
-            <Button onClick={verify2FA} class="mt-4 w-full" variant="outline" disabled={!verifyOtp()}>
+            <Button
+              onClick={verify2FA}
+              class="mt-4 w-full"
+              variant="outline"
+              disabled={!verifyOtp()}
+            >
               Verify and enable
             </Button>
           </div>

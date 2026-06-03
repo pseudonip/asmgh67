@@ -5,6 +5,7 @@ A self-hostable authoritative DNS server with a web dashboard and admin panel.
 <img width="1920" height="996" alt="image" src="https://github.com/user-attachments/assets/57e1615a-c2c1-4cbb-b676-4182bb800248" />
 
 ## Todo List
+
 - [x] 2FA
 - [x] Most common DNS record types
 - [ ] DNSSEC
@@ -19,6 +20,7 @@ A self-hostable authoritative DNS server with a web dashboard and admin panel.
 `packages/types` is a package of types that are shared between control and nameserver
 
 ## Prerequisites
+
 - Bun 1.3 or newer
 - PostgreSQL
 - (for production) a domain name where you can set glue records for nameservers, and a minimum of 1 server with a public IP (but ideally 2 servers)

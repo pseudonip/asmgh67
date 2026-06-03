@@ -14,8 +14,8 @@ import {
   OTPFieldGroup,
   OTPFieldInput,
   OTPFieldSeparator,
-  OTPFieldSlot
-} from "~/components/ui/otp-field"
+  OTPFieldSlot,
+} from "~/components/ui/otp-field";
 import { verify2FA } from "~/lib/server/auth.actions";
 
 export default function Login2FA() {
@@ -49,12 +49,18 @@ export default function Login2FA() {
           <CardHeader class="space-y-1">
             <CardTitle class="text-2xl">Two-Factor Authentication</CardTitle>
             <CardDescription>
-              2FA is enabled for your account, please enter the OTP code from your authenticator app
+              2FA is enabled for your account, please enter the OTP code from
+              your authenticator app
             </CardDescription>
           </CardHeader>
 
           <CardContent class="grid gap-4">
-            <OTPField maxLength={6} value={otp()} onValueChange={setOtp} class="mx-auto">
+            <OTPField
+              maxLength={6}
+              value={otp()}
+              onValueChange={setOtp}
+              class="mx-auto"
+            >
               <OTPFieldInput />
               <OTPFieldGroup>
                 <OTPFieldSlot index={0} />

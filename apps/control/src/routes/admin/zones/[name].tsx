@@ -52,10 +52,10 @@ export default function AdminZones() {
   return (
     <main class="p-4 flex flex-col h-screen">
       <div class="mb-4">
-        <h1 class="text-2xl ml-1 leading-none font-semibold">Zone: {data()?.zone.name}</h1>
-        <p class="text-sm text-muted-foreground ml-1 mt-1">
-          Admin view
-        </p>
+        <h1 class="text-2xl ml-1 leading-none font-semibold">
+          Zone: {data()?.zone.name}
+        </h1>
+        <p class="text-sm text-muted-foreground ml-1 mt-1">Admin view</p>
       </div>
 
       <div class="grid grid-cols-4 gap-4">
@@ -81,7 +81,11 @@ export default function AdminZones() {
       </div>
 
       <div class="mt-4 min-h-0">
-        <Table columns={columns} data={recordData()} noEntriesMessage="No records found" />
+        <Table
+          columns={columns}
+          data={recordData()}
+          noEntriesMessage="No records found"
+        />
       </div>
     </main>
   );

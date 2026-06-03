@@ -32,7 +32,6 @@ export const users = pgTable("users", {
 
   mfaEnabled: boolean("mfa_enabled").notNull().default(false),
   mfaSecret: text("mfa_secret"),
-
 });
 
 export const apiKeys = pgTable("api_keys", {

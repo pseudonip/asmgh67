@@ -8,7 +8,11 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createApiKey, deleteApiKey, getApiKeys } from "~/lib/server/api.actions";
+import {
+  createApiKey,
+  deleteApiKey,
+  getApiKeys,
+} from "~/lib/server/api.actions";
 
 const columns: ColumnDef<{ name: string }>[] = [
   {
@@ -54,7 +58,10 @@ export default function APISettings() {
     try {
       const key = await createApiKey(keyName());
 
-      setKeys((prev) => [...(prev ?? []), { id: key.id, name: keyName(), tokenStart: key.token.slice(0, 16) }]);
+      setKeys((prev) => [
+        ...(prev ?? []),
+        { id: key.id, name: keyName(), tokenStart: key.token.slice(0, 16) },
+      ]);
       setKeyToken(key.token);
       setKeyName("");
     } catch (e) {
@@ -106,14 +113,22 @@ export default function APISettings() {
         <For each={keys()}>
           {(key) => (
             <div class="flex bg-muted/25 border rounded-lg p-4">
-              <Key class="my-auto mr-2 bg-muted p-2 rounded-lg border" size={36} />
+              <Key
+                class="my-auto mr-2 bg-muted p-2 rounded-lg border"
+                size={36}
+              />
 
               <div class="ml-2 leading-none my-auto">
                 <p class="font-medium">{key.name}</p>
                 <p class="text-sm text-muted-foreground">{key.tokenStart}...</p>
               </div>
 
-              <Button onClick={() => deleteKey(key.id)} class="ml-auto self-end" variant="destructive" size="icon">
+              <Button
+                onClick={() => deleteKey(key.id)}
+                class="ml-auto self-end"
+                variant="destructive"
+                size="icon"
+              >
                 <Trash size={16} />
               </Button>
             </div>

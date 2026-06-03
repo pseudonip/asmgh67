@@ -10,22 +10,24 @@ import {
   Settings,
   User,
   ChartArea,
-  Shovel
+  Shovel,
 } from "lucide-solid";
 import { createResource, createSignal, onMount, Show } from "solid-js";
 import { cn } from "~/lib/utils";
 import DomainSwitcher from "./DomainSwitcher";
 import Nav from "./Nav";
 import { Button } from "./ui/button";
-import { getLocalsUser, getUser, logout as serverLogout } from "~/lib/server/auth.actions";
+import {
+  getLocalsUser,
+  getUser,
+  logout as serverLogout,
+} from "~/lib/server/auth.actions";
 
 interface SidebarProps {
   domains: string[];
   zone?: string;
   admin?: boolean;
 }
-
-
 
 export default function Sidebar(props: SidebarProps) {
   const [user] = createResource(getLocalsUser);
@@ -104,7 +106,7 @@ export default function Sidebar(props: SidebarProps) {
       url: "/admin/dig",
       icon: Shovel,
       variant: variant((p) => p === "/admin/dig"),
-    }
+    },
   ];
 
   async function logout() {

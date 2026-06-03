@@ -16,7 +16,9 @@ export default function Zone() {
     <main class="p-4 px-5 flex flex-col h-screen">
       <div>
         <div class="flex">
-          <h1 class="text-2xl leading-none font-semibold">{zoneData()?.name}</h1>
+          <h1 class="text-2xl leading-none font-semibold">
+            {zoneData()?.name}
+          </h1>
 
           <Show when={zoneData()?.status == "active"}>
             <span class="text-sm text-ctp-green p-1 px-3 rounded-full bg-ctp-green/10 ml-auto">
@@ -30,9 +32,7 @@ export default function Zone() {
             </span>
           </Show>
         </div>
-        <p class="text-sm text-muted-foreground mt-1">
-          Zone overview
-        </p>
+        <p class="text-sm text-muted-foreground mt-1">Zone overview</p>
       </div>
     </main>
   );

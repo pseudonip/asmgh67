@@ -63,7 +63,10 @@ export async function register({
   });
 }
 
-export async function login(email: string, password: string): Promise<{ mfaRequired: boolean }> {
+export async function login(
+  email: string,
+  password: string,
+): Promise<{ mfaRequired: boolean }> {
   const [user] = await db
     .select()
     .from(users)
@@ -171,7 +174,13 @@ export async function getUser(includeNotVerified = false) {
 }
 
 export async function getLocalsUser(): Promise<
-  { displayName: string; email: string; isAdmin: boolean, mfaEnabled: boolean } | undefined
+  | {
+      displayName: string;
+      email: string;
+      isAdmin: boolean;
+      mfaEnabled: boolean;
+    }
+  | undefined
 > {
   "use server";
   const event = getRequestEvent();
@@ -199,7 +208,9 @@ export async function getLocalsUser(): Promise<
   };
 }
 
-export async function setup2FA(password: string): Promise<{ url: string; base32: string }> {
+export async function setup2FA(
+  password: string,
+): Promise<{ url: string; base32: string }> {
   const user = await getUser();
 
   if (!user) {
@@ -221,7 +232,8 @@ export async function setup2FA(password: string): Promise<{ url: string; base32:
     secret: new OTPAuth.Secret(),
   });
 
-  await db.update(users)
+  await db
+    .update(users)
     .set({ mfaSecret: totp.secret.base32 })
     .where(eq(users.id, user.id))
     .execute();
@@ -229,7 +241,7 @@ export async function setup2FA(password: string): Promise<{ url: string; base32:
   return {
     url: totp.toString(),
     base32: totp.secret.base32,
-  }
+  };
 }
 
 export async function first2FAVerify(token: string) {
@@ -256,7 +268,8 @@ export async function first2FAVerify(token: string) {
     throw new Error("Invalid 2FA token");
   }
 
-  await db.update(users)
+  await db
+    .update(users)
     .set({ mfaEnabled: true })
     .where(eq(users.id, user.id))
     .execute();
@@ -303,7 +316,8 @@ export async function verify2FA(token: string) {
 
   const sha256 = createHash("sha256").update(tokenValue).digest();
 
-  await db.update(sessions)
+  await db
+    .update(sessions)
     .set({ mfa_verified: true })
     .where(eq(sessions.tokenHash, sha256))
     .execute();

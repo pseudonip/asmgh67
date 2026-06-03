@@ -21,10 +21,11 @@ export async function getUserFromToken(token: string): Promise<{
     )
     .execute();
 
-  if (!session) return {
-    user: null,
-    mfaRequired: false,
-  };
+  if (!session)
+    return {
+      user: null,
+      mfaRequired: false,
+    };
 
   if (session.user.mfaEnabled && !session.mfa_verified) {
     return {
@@ -36,5 +37,5 @@ export async function getUserFromToken(token: string): Promise<{
   return {
     user: session.user,
     mfaRequired: false,
-  }
+  };
 }

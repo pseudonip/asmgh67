@@ -1,10 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { createHash } from "crypto";
 import { db } from "~/lib/server/db";
-import {
-  nameservers,
-  queryStats,
-} from "~/lib/server/db/schema";
+import { nameservers, queryStats } from "~/lib/server/db/schema";
 
 export async function POST({ request }) {
   const auth = request.headers.get("Authorization");
@@ -55,7 +52,8 @@ export async function POST({ request }) {
       .onConflictDoUpdate({
         target: [queryStats.zoneName, queryStats.bucket, queryStats.rcode],
         set: { count: sql`${queryStats.count} + excluded.count` },
-      }).execute();
+      })
+      .execute();
 
     return new Response("OK");
   } catch (error) {
