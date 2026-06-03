@@ -16,7 +16,7 @@ export default function App(props: { children: any }) {
       variant: variant((path) => path === "/app/settings/security"),
     },
     {
-      title: "API Tokens",
+      title: "API Keys",
       url: "/app/settings/api",
       icon: Key,
       variant: variant((path) => path === "/app/settings/api"),

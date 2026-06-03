@@ -42,6 +42,7 @@ export const apiKeys = pgTable("api_keys", {
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   tokenHash: bytea("token_hash").notNull().unique(),
+  tokenStart: text("token_start"), // to show key, is first 16 chars
 });
 
 export const sessions = pgTable(

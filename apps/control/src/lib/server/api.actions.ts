@@ -24,6 +24,7 @@ export async function createApiKey(
       userId: user.id,
       name,
       tokenHash: hash,
+      tokenStart: token.slice(0, 16),
     })
     .returning()
     .execute();
@@ -34,7 +35,7 @@ export async function createApiKey(
   };
 }
 
-export async function getApiKeys(): Promise<{ id: string; name: string }[]> {
+export async function getApiKeys(): Promise<{ id: string; name: string, tokenStart: string }[]> {
   const user = await getUser();
 
   if (!user) {
@@ -50,5 +51,30 @@ export async function getApiKeys(): Promise<{ id: string; name: string }[]> {
   return keys.map((key) => ({
     id: key.id,
     name: key.name,
+    tokenStart: key.tokenStart ?? ""
   }));
+}
+
+export async function deleteApiKey(id: string) {
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const [key] = await db
+    .select()
+    .from(apiKeys)
+    .where(eq(apiKeys.id, id))
+    .execute();
+
+  if (!key) {
+    throw new Error("API key not found");
+  }
+
+  if (key.userId !== user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  await db.delete(apiKeys).where(eq(apiKeys.id, id)).execute();
 }

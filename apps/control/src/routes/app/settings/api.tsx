@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/solid-table";
-import { Trash } from "lucide-solid";
-import { createResource, createSignal, Show } from "solid-js";
+import { Key, Trash } from "lucide-solid";
+import { createResource, createSignal, For, Show } from "solid-js";
 import Table from "~/components/Table";
 import { Button } from "~/components/ui/button";
 import {
@@ -8,7 +8,7 @@ import {
   TextFieldInput,
   TextFieldLabel,
 } from "~/components/ui/text-field";
-import { createApiKey, getApiKeys } from "~/lib/server/api.actions";
+import { createApiKey, deleteApiKey, getApiKeys } from "~/lib/server/api.actions";
 
 const columns: ColumnDef<{ name: string }>[] = [
   {
@@ -54,11 +54,20 @@ export default function APISettings() {
     try {
       const key = await createApiKey(keyName());
 
-      setKeys((prev) => [...(prev ?? []), { id: key.id, name: keyName() }]);
+      setKeys((prev) => [...(prev ?? []), { id: key.id, name: keyName(), tokenStart: key.token.slice(0, 16) }]);
       setKeyToken(key.token);
       setKeyName("");
     } catch (e) {
       console.error("Failed to create API key:", e);
+    }
+  }
+
+  async function deleteKey(id: string) {
+    try {
+      await deleteApiKey(id);
+      setKeys((prev) => prev?.filter((key) => key.id !== id) ?? []);
+    } catch (e) {
+      console.error("Failed to delete API key:", e);
     }
   }
 
@@ -93,11 +102,24 @@ export default function APISettings() {
         </Show>
       </div>
 
-      <Table
-        columns={columns}
-        data={keys() ?? []}
-        noEntriesMessage="No API keys found"
-      />
+      <div class="rounded-lg p-4 bg-card border gap-2 flex flex-col">
+        <For each={keys()}>
+          {(key) => (
+            <div class="flex bg-muted/25 border rounded-lg p-4">
+              <Key class="my-auto mr-2 bg-muted p-2 rounded-lg border" size={36} />
+
+              <div class="ml-2 leading-none my-auto">
+                <p class="font-medium">{key.name}</p>
+                <p class="text-sm text-muted-foreground">{key.tokenStart}...</p>
+              </div>
+
+              <Button onClick={() => deleteKey(key.id)} class="ml-auto self-end" variant="destructive" size="icon">
+                <Trash size={16} />
+              </Button>
+            </div>
+          )}
+        </For>
+      </div>
     </main>
   );
 }
