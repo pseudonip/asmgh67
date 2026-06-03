@@ -3,7 +3,7 @@
 import bcrypt from "bcrypt";
 import * as OTPAuth from "otpauth";
 import { randomBytes, createHash } from "crypto";
-import { eq } from "drizzle-orm";
+import { ne, eq, and } from "drizzle-orm";
 import { setCookie, getCookie } from "vinxi/http";
 import { getRequestEvent } from "solid-js/web";
 
@@ -19,20 +19,19 @@ export async function register({
   displayName: string;
   email: string;
   password: string;
-}) {
-  try {
-    const emailExists = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .execute();
+  }) {
+  if (password.length < 8) {
+    throw new Error("Password must be at least 8 characters long");
+  }
 
-    if (emailExists.length > 0) {
-      throw new Error("Email already in use");
-    }
-  } catch (err) {
-    console.error("Error checking email existence:", err);
-    throw new Error("An error occurred while creating your account");
+  const emailExists = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
+
+  if (emailExists.length > 0) {
+    throw new Error("Email already in use");
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -148,6 +147,33 @@ export async function changePassword(oldPassword: string, newPassword: string) {
     .set({ passwordHash: newHash })
     .where(eq(users.id, user.id))
     .execute();
+
+  // delete all other sessions
+
+  const req = getRequestEvent()?.request;
+
+  let token;
+
+  try {
+    token = getCookie("token");
+  } catch {
+    const cookieHeader = req?.headers.get("cookie") ?? "";
+    token = cookieHeader.match(/(?:^|;\s*)token=([^;]*)/)?.[1];
+  }
+
+  if (token) {
+    const sha256 = createHash("sha256").update(token).digest();
+
+    await db
+      .delete(sessions)
+      .where(
+        and(
+          ne(sessions.tokenHash, sha256),
+          eq(sessions.userId, user.id),
+        )
+      )
+      .execute();
+  }
 }
 
 export async function getUser(includeNotVerified = false) {

@@ -3,24 +3,24 @@ import { z } from "zod";
 export const recordSchemas = {
   A: z.object({ address: z.ipv4() }),
   AAAA: z.object({ address: z.ipv6() }),
-  CNAME: z.object({ target: z.string().min(1) }),
-  NS: z.object({ target: z.string().min(1) }),
-  PTR: z.object({ target: z.string().min(1) }),
-  TXT: z.object({ text: z.string() }),
+  CNAME: z.object({ target: z.string().min(1).max(255) }),
+  NS: z.object({ target: z.string().min(1).max(255) }),
+  PTR: z.object({ target: z.string().min(1).max(255) }),
+  TXT: z.object({ text: z.string().min(1).max(255) }),
   MX: z.object({
     priority: z.number().int().nonnegative(),
-    target: z.string().min(1),
+    target: z.string().min(1).max(255),
   }),
   SRV: z.object({
     priority: z.number().int().nonnegative(),
     weight: z.number().int().nonnegative(),
     port: z.number().int().min(1).max(65535),
-    target: z.string().min(1),
+    target: z.string().min(1).max(255),
   }),
   CAA: z.object({
     flags: z.number().int().min(0).max(255),
     tag: z.enum(["issue", "issuewild", "iodef"]),
-    value: z.string().min(1),
+    value: z.string().min(1).max(255),
   }),
 };
 

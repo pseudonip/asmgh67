@@ -32,7 +32,7 @@ export async function DELETE({ params, request }) {
     .where(and(eq(records.id, id), eq(records.zoneId, zone.id)))
     .execute();
 
-  await sendZoneUpdate(zone.name);
+  await sendZoneUpdate(zone.id);
 
   return Response.json({ success: true });
 }
