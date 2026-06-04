@@ -9,26 +9,6 @@ const PORT = Number(process.env.PORT) || 5354;
 
 let state = new State();
 
-try {
-  const res = await fetch(`${process.env.CONTROL_SERVER}/api/dns/zones`, {
-    headers: {
-      Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
-    },
-  });
-
-  if (res.ok) {
-    const zones = await res.json();
-    console.log("Received zones from control server:", zones);
-    state.setState(zones);
-
-    console.log("Loaded zones from control server");
-  } else {
-    console.error("Failed to load zones from control server:", res.statusText);
-  }
-} catch (err) {
-  console.error("Error loading zones from control server:", err);
-}
-
 await Bun.udpSocket({
   port: PORT,
   hostname: "0.0.0.0",
@@ -76,6 +56,27 @@ while (true) {
 
     wait = 1000;
     console.log("Connected to control server SSE stream");
+
+    // so that incase we missed updates while offline
+    try {
+      const res = await fetch(`${process.env.CONTROL_SERVER}/api/dns/zones`, {
+        headers: {
+          Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
+        },
+      });
+
+      if (res.ok) {
+        const zones = await res.json();
+        console.log("Received zones from control server:", zones);
+        state.setState(zones);
+
+        console.log("Loaded zones from control server");
+      } else {
+        console.error("Failed to load zones from control server:", res.statusText);
+      }
+    } catch (err) {
+      console.error("Error loading zones from control server:", err);
+    }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
