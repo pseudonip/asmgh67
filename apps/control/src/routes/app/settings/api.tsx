@@ -1,4 +1,3 @@
-import { ColumnDef } from "@tanstack/solid-table";
 import { Key, Trash } from "lucide-solid";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button";

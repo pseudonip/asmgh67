@@ -68,6 +68,12 @@ export default function Sidebar(props: SidebarProps) {
       icon: List,
       variant: variant((p) => p === `/app/zones/${domain}/dns`),
     },
+    {
+      title: "Settings",
+      url: `/app/zones/${domain}/settings`,
+      icon: Settings,
+      variant: variant((p) => p === `/app/zones/${domain}/settings`),
+    }
   ];
 
   const adminLinks = () => [

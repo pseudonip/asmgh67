@@ -112,6 +112,15 @@ while (true) {
             } catch (err) {
               console.error("Failed to parse zone update data:", err);
             }
+          } else if (event === "deleteZone") {
+            try {
+              const { name } = JSON.parse(data);
+
+              console.log("Received zone delete from control server:", name);
+              state.delete(name);
+            } catch (err) {
+              console.error("Failed to parse zone delete data:", err);
+            }
           }
         }
       }

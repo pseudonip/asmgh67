@@ -52,4 +52,8 @@ export class State {
     const key = `${qname}:${qtype}`;
     return zone.records[key] || [];
   }
+
+  delete(zoneName: string) {
+    this.zones.delete(zoneName);
+  }
 }

@@ -3,7 +3,7 @@ import { resolveNs } from "node:dns/promises";
 
 import { db } from "./db";
 import { nameservers, zones } from "./db/schema";
-import { sendZoneUpdate } from "~/routes/api/dns/sse";
+import { sendZoneDeletion, sendZoneUpdate } from "~/routes/api/dns/sse";
 
 export async function createZoneForUser(userId: string, name: string) {
   const existingZone = await db
@@ -114,4 +114,23 @@ export async function getZoneSetupStatusForUser(userId: string, name: string) {
       added: [],
     };
   }
+}
+
+export async function deleteZoneForUser(userId: string, name: string) {
+  const [zone] = await db
+    .select()
+    .from(zones)
+    .where(eq(zones.name, name))
+    .execute();
+
+  if (!zone) {
+    throw new Error("Zone not found");
+  }
+
+  if (zone.userId !== userId) {
+    throw new Error("Unauthorized");
+  }
+
+  await db.delete(zones).where(eq(zones.name, name)).execute();
+  await sendZoneDeletion(zone.name, zone.nsPool);
 }

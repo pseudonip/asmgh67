@@ -7,6 +7,7 @@ import {
   getZoneForUser,
   getZonesForUser,
   getZoneSetupStatusForUser,
+  deleteZoneForUser
 } from "./zones.server";
 
 async function requireUser() {
@@ -45,4 +46,10 @@ export async function getZoneSetupStatus(name: string) {
   const user = await requireUser();
 
   return await getZoneSetupStatusForUser(user.id, name);
+}
+
+export async function deleteZone(name: string) {
+  const user = await requireUser();
+
+  await deleteZoneForUser(user.id, name);
 }
