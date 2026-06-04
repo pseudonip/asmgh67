@@ -19,7 +19,7 @@ export async function register({
   displayName: string;
   email: string;
   password: string;
-  }) {
+}) {
   if (password.length < 8) {
     throw new Error("Password must be at least 8 characters long");
   }
@@ -164,12 +164,7 @@ export async function changePassword(oldPassword: string, newPassword: string) {
 
     await db
       .delete(sessions)
-      .where(
-        and(
-          ne(sessions.tokenHash, sha256),
-          eq(sessions.userId, user.id),
-        )
-      )
+      .where(and(ne(sessions.tokenHash, sha256), eq(sessions.userId, user.id)))
       .execute();
   }
 }

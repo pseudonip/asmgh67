@@ -73,7 +73,7 @@ export default function Sidebar(props: SidebarProps) {
       url: `/app/zones/${domain}/settings`,
       icon: Settings,
       variant: variant((p) => p === `/app/zones/${domain}/settings`),
-    }
+    },
   ];
 
   const adminLinks = () => [

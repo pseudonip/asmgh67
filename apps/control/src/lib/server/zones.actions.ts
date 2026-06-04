@@ -7,7 +7,7 @@ import {
   getZoneForUser,
   getZonesForUser,
   getZoneSetupStatusForUser,
-  deleteZoneForUser
+  deleteZoneForUser,
 } from "./zones.server";
 
 async function requireUser() {

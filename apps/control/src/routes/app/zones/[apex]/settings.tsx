@@ -35,29 +35,37 @@ export default function App(props: { children: any }) {
         </p>
       </div>
 
-
       <div class="bg-card border rounded-xl mt-4">
         <div class="p-4 px-6 border-b">
           <p class="font-semibold">Delete Zone</p>
           <p class="text-sm text-ctp-red">
-            This will delete your zone, all records and all data associated with it from Raincloud
+            This will delete your zone, all records and all data associated with
+            it from Raincloud
           </p>
         </div>
 
         <div class="p-4 px-6 flex gap-4">
           <TextField>
             <TextFieldLabel>
-              Enter the zone name <span class="font-bold">{zoneData()?.name}</span> to confirm
+              Enter the zone name{" "}
+              <span class="font-bold">{zoneData()?.name}</span> to confirm
             </TextFieldLabel>
-            <TextFieldInput value={confirmZoneName()} onInput={(e) => setConfirmZoneName(e.currentTarget.value)} />
+            <TextFieldInput
+              value={confirmZoneName()}
+              onInput={(e) => setConfirmZoneName(e.currentTarget.value)}
+            />
           </TextField>
 
-          <Button disabled={confirmZoneName() !== zoneData()?.name} onClick={deleteZone} class="ml-auto self-end" variant="destructive">
+          <Button
+            disabled={confirmZoneName() !== zoneData()?.name}
+            onClick={deleteZone}
+            class="ml-auto self-end"
+            variant="destructive"
+          >
             Delete Zone
           </Button>
         </div>
       </div>
-
     </main>
   );
 }

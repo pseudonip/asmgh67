@@ -72,7 +72,10 @@ while (true) {
 
         console.log("Loaded zones from control server");
       } else {
-        console.error("Failed to load zones from control server:", res.statusText);
+        console.error(
+          "Failed to load zones from control server:",
+          res.statusText,
+        );
       }
     } catch (err) {
       console.error("Error loading zones from control server:", err);

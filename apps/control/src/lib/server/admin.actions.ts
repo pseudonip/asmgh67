@@ -33,7 +33,15 @@ export async function getAllZones() {
 export async function getAllUsers() {
   await requireAdmin();
 
-  return await db.select().from(users).execute();
+  return await db
+    .select({
+      id: users.id,
+      displayName: users.displayName,
+      email: users.email,
+      mfaEnabled: users.mfaEnabled,
+    })
+    .from(users)
+    .execute();
 }
 
 export async function getOverview() {

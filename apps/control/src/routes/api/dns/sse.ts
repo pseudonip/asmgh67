@@ -55,8 +55,6 @@ export async function GET({ request, nativeEvent }) {
         streams.get(ns.pool)!.add(send);
       }
 
-      console.log(streams);
-
       const heartbeat = setInterval(() => {
         try {
           controller.enqueue(encoder.encode(": ping\n\n"));
@@ -171,7 +169,6 @@ export async function sendZoneUpdate(zoneId: string) {
 
   const poolStreams = streams.get(zoneData.nsPool);
 
-  console.log(streams);
   console.log(
     `Found ${poolStreams?.size ?? 0} stream(s) for pool ${zoneData.nsPool}`,
   );
