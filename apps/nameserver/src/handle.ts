@@ -129,6 +129,10 @@ function emptyResp(query: Packet, zone: Zone): Packet {
         mname: process.env.SOA_MNAME!,
         rname: process.env.SOA_RNAME!,
         serial: zone.serial,
+        refresh: 10800,
+        retry: 3600,
+        expire: 604800,
+        minimum: 300,
       },
     },
   ];
