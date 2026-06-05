@@ -4,6 +4,7 @@ import { ServerEventName } from "@raincloud/types/sse";
 import handle from "./handle";
 import { State } from "./state";
 import { startStats } from "./stats";
+import { applyEdns } from "./edns";
 
 const PORT = Number(process.env.PORT) || 5354;
 
@@ -20,7 +21,9 @@ await Bun.udpSocket({
           `Received query for ${query.questions?.map((q: any) => `${q.name}:${q.type}`).join(", ")}`,
         );
 
-        const res = handle(query, state);
+        let res = handle(query, state);
+        res = applyEdns(res, query);
+
         const encoded = dnsPacket.encode(res);
 
         socket.send(encoded, port, address);
