@@ -8,10 +8,10 @@ A self-hostable authoritative DNS server with a web dashboard and admin panel.
 
 - [x] 2FA
 - [x] Most common DNS record types
-- [ ] DNSSEC
 - [ ] API token scoping
 - [ ] CNAME flattening
 - [ ] Proper analytics/stats
+- [ ] DNSSEC
 
 ## Architecture
 

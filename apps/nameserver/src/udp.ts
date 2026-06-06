@@ -1,5 +1,5 @@
 import dnsPacket from "dns-packet";
-import { applyEdns } from "./edns";
+import { applyEdns, readEdns } from "./edns";
 import handle from "./handle";
 import { State } from "./state";
 
@@ -16,9 +16,16 @@ export function startUdp(port: number, state: State) {
           );
 
           let res = handle(query, state);
-          res = applyEdns(res, query);
+          res = applyEdns(res, query);''
 
-          const encoded = dnsPacket.encode(res);
+          let encoded = dnsPacket.encode(res);
+          const { udpSize } = readEdns(query);
+
+          if (encoded.length > udpSize) {
+            res.flags = (res.flags ?? 0x8400) | 0x0200; // TC
+            res.answers = [];
+            encoded = dnsPacket.encode(res);
+          }
 
           socket.send(encoded, port, address);
         } catch (err) {
