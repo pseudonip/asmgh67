@@ -1,6 +1,6 @@
 import { Packet } from "dns-packet";
 
-const MAX_UDP_SIZE = 1024;
+const MAX_UDP_SIZE = 1232;
 
 export type EdnsData = {
   present: boolean;
