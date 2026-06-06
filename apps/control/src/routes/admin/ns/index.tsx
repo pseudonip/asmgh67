@@ -18,6 +18,23 @@ export const columns: ColumnDef<Omit<Nameserver, "auth_token_hash">>[] = [
     accessorKey: "pool",
     header: "Pool",
   },
+  {
+    accessorKey: "ok",
+    header: "Status",
+    cell: (info) => {
+      const ok = info.getValue();
+
+      return ok ? (
+        <span class="text-xs text-ctp-green p-1 px-3 rounded-full bg-ctp-green/10">
+          Online
+        </span>
+      ) : (
+        <span class="text-xs text-ctp-red p-1 px-3 rounded-full bg-ctp-red/10">
+          Offline
+        </span>
+      );
+    }
+  }
 ];
 
 export default function AdminNs() {

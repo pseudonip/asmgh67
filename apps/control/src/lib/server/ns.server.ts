@@ -1,9 +1,10 @@
+import dgram from "node:dgram";
 import { createHash, randomBytes } from "crypto";
 import { db } from "./db";
 import { nameservers } from "./db/schema";
 
 export async function listNameservers() {
-  return await db
+  let ns = await db
     .select({
       id: nameservers.id,
       hostname: nameservers.hostname,
@@ -12,6 +13,41 @@ export async function listNameservers() {
     })
     .from(nameservers)
     .execute();
+
+  return Promise.all(
+    ns.map((n) => {
+      return new Promise((resolve) => {
+        const client = dgram.createSocket("udp4");
+        const start = performance.now();
+
+        const timeout = setTimeout(() => {
+          client.close();
+          resolve({ ...n, ok: false });
+        }, 2000);
+
+        client.send("ping", 53, n.ipv4, (err) => {
+          if (err) {
+            clearTimeout(timeout);
+            client.close();
+            resolve({ ...n, ok: false });
+          }
+        });
+
+        client.on("message", () => {
+          const latency = performance.now() - start;
+          clearTimeout(timeout);
+          client.close();
+          resolve({ ...n, ok: true });
+        });
+
+        client.on("error", () => {
+          clearTimeout(timeout);
+          client.close();
+          resolve({ ...n, ok: false });
+        });
+      });
+    })
+  )
 }
 
 export async function createNameserver(

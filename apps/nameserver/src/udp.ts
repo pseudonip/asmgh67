@@ -9,6 +9,11 @@ export function startUdp(port: number, state: State) {
     hostname: "0.0.0.0",
     socket: {
       data(socket: any, data: any, port: number, address: string) {
+        if (data.toString() === "ping") {
+          socket.send("pong", port, address);
+          return;
+        }
+
         try {
           const query = dnsPacket.decode(Buffer.from(data));
           console.log(
