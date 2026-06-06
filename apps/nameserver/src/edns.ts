@@ -18,8 +18,6 @@ export function readEdns(query: Packet): EdnsData {
     version: 0,
   }
 
-  console.log("EDNS OPT record found: ", opt);
-
   return {
     present: true,
     udpSize: Math.min(opt.udpPayloadSize ?? 512, MAX_UDP_SIZE),

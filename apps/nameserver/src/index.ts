@@ -1,40 +1,16 @@
-import dnsPacket from "dns-packet";
 import "dotenv/config";
 import { ServerEventName } from "@raincloud/types/sse";
-import handle from "./handle";
 import { State } from "./state";
 import { startStats } from "./stats";
-import { applyEdns } from "./edns";
+import { startUdp } from "./udp";
+import { startTcp } from "./tcp";
 
 const PORT = Number(process.env.PORT) || 5354;
 
 let state = new State();
 
-await Bun.udpSocket({
-  port: PORT,
-  hostname: "0.0.0.0",
-  socket: {
-    data(socket: any, data: any, port: number, address: string) {
-      try {
-        const query = dnsPacket.decode(Buffer.from(data));
-        console.log(
-          `Received query for ${query.questions?.map((q: any) => `${q.name}:${q.type}`).join(", ")}`,
-        );
-
-        let res = handle(query, state);
-        res = applyEdns(res, query);
-
-        const encoded = dnsPacket.encode(res);
-
-        socket.send(encoded, port, address);
-      } catch (err) {
-        console.error("Failed to handle DNS query: ", err);
-      }
-    },
-  },
-});
-
-console.log(`DNS server is running on port ${PORT}`);
+startUdp(PORT, state);
+startTcp(PORT, state);
 
 startStats();
 
