@@ -4,15 +4,6 @@ A self-hostable authoritative DNS server with a web dashboard and admin panel.
 
 <img width="1920" height="996" alt="image" src="https://github.com/user-attachments/assets/57e1615a-c2c1-4cbb-b676-4182bb800248" />
 
-## Todo List
-
-- [x] 2FA
-- [x] Most common DNS record types
-- [ ] API token scoping
-- [ ] CNAME flattening
-- [ ] Proper analytics/stats
-- [ ] DNSSEC
-
 ## Architecture
 
 `apps/control` is the web dashboard and admin panel, along with being the source of truth for zone info and records
@@ -89,3 +80,34 @@ PORT=53 sudo bun start
 ```
 
 For actual production you will need to set up glue records for your nameservers (for example ns1.example.com and ns2.example.com) with your domain registrars.
+
+## (incomplete) Feature List
+
+### DNS
+- [x] Common DNS types (A, AAAA, CNAME, NS, PTR, TXT, MX, SRV, CAA)
+- [x] Per-record TTL
+- [x] Auto generated SOA records
+- [ ] DNSSEC
+- [ ] Wildcard records
+- [ ] ALIAS/ANAME records
+- [ ] CNAME flattening
+
+### Dashboard
+- [x] Zone creation and deletion
+- [x] Record creation and deletion
+- [ ] Record editing
+- [ ] Analytics
+- [ ] BIND export and import
+- [ ] Record searching and filtering
+- [ ] AXFR / IXFR, w/ TSIG
+
+### API
+- [x] Rest API for record managment
+- [x] API key creation / deletion
+- [ ] API key scoping
+- [ ] API docs
+
+### Operations
+- [x] Basic nameserver status display
+- [ ] Improved health checks
+- [ ] Continuous NS record checks for zones

@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Nameserver } from "~/lib/server/db/schema";
 import { getNameservers } from "~/lib/server/ns.actions";
 import Table from "~/components/Table";
+import { Edit } from "lucide-solid";
 
 export const columns: ColumnDef<Omit<Nameserver, "auth_token_hash">>[] = [
   {
@@ -32,6 +33,19 @@ export const columns: ColumnDef<Omit<Nameserver, "auth_token_hash">>[] = [
         <span class="text-xs text-ctp-red p-1 px-3 rounded-full bg-ctp-red/10">
           Offline
         </span>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: "",
+    cell: (info) => {
+      return (
+        <div class="flex gap-2 justify-end">
+          <a href={`/admin/ns/${info.row.original.id}/edit`} class="btn">
+            <Edit size={16} />
+          </a>
+        </div>
       );
     },
   },
