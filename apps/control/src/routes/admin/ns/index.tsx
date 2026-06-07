@@ -33,8 +33,8 @@ export const columns: ColumnDef<Omit<Nameserver, "auth_token_hash">>[] = [
           Offline
         </span>
       );
-    }
-  }
+    },
+  },
 ];
 
 export default function AdminNs() {

@@ -4,7 +4,7 @@ import handle from "./handle";
 import { State } from "./state";
 
 export function startUdp(port: number, state: State) {
- Bun.udpSocket({
+  Bun.udpSocket({
     port: port,
     hostname: "0.0.0.0",
     socket: {
@@ -21,7 +21,8 @@ export function startUdp(port: number, state: State) {
           );
 
           let res = handle(query, state);
-          res = applyEdns(res, query);''
+          res = applyEdns(res, query);
+          ("");
 
           let encoded = dnsPacket.encode(res);
           const { udpSize } = readEdns(query);

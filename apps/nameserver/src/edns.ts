@@ -7,23 +7,24 @@ export type EdnsData = {
   udpSize: number;
   doBit: boolean;
   version: number;
-}
+};
 
 export function readEdns(query: Packet): EdnsData {
-  const opt = query.additionals?.find(a => a.type === "OPT");
-  if (!opt) return {
-    present: false,
-    udpSize: 512,
-    doBit: false,
-    version: 0,
-  }
+  const opt = query.additionals?.find((a) => a.type === "OPT");
+  if (!opt)
+    return {
+      present: false,
+      udpSize: 512,
+      doBit: false,
+      version: 0,
+    };
 
   return {
     present: true,
     udpSize: Math.min(opt.udpPayloadSize ?? 512, MAX_UDP_SIZE),
     doBit: !!opt.flag_do,
     version: opt.ednsVersion ?? 0,
-  }
+  };
 }
 
 export function applyEdns(packet: Packet, query: Packet): Packet {

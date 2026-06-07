@@ -46,8 +46,8 @@ export async function listNameservers() {
           resolve({ ...n, ok: false });
         });
       });
-    })
-  )
+    }),
+  );
 }
 
 export async function createNameserver(

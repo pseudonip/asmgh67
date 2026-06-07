@@ -46,7 +46,7 @@ export function startTcp(port: number, state: State) {
 
       error(socket, err) {
         console.error("TCP socket error: ", err);
-      }
-    }
+      },
+    },
   });
 }
