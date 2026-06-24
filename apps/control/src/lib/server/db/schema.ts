@@ -40,6 +40,7 @@ export const apiKeys = pgTable("api_keys", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  scopes: text("scopes").array().notNull().default(["*:read", "*:write"]),
   tokenHash: bytea("token_hash").notNull().unique(),
   tokenStart: text("token_start"), // to show key, is first 16 chars
 });

@@ -79,7 +79,7 @@ cd apps/nameserver
 PORT=53 sudo bun start
 ```
 
-For actual production you will need to set up glue records for your nameservers (for example ns1.example.com and ns2.example.com) with your domain registrars.
+For actual production you will need to set up glue records for your nameservers (for example ns1.example.com and ns2.example.com) with your domain registrar.
 
 ## (incomplete) Feature List
 
