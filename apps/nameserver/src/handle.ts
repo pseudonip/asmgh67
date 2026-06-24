@@ -46,6 +46,14 @@ export default function handle(query: Packet, state: State): Packet {
     records = state.lookup(zone, qname, "CNAME");
   }
 
+  if (records.length === 0 && !isApex) {
+    const parts = qname.split(".");
+    parts[0] = "*";
+    const wildcardName = parts.join(".");
+
+    records = state.lookup(zone, wildcardName, qtype);
+  }
+
   if (records.length > 0) {
     recordQuery(qname, "NOERROR");
     return answerResp(query, zone, records);
