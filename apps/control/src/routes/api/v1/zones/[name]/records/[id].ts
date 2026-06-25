@@ -28,7 +28,7 @@ export async function DELETE({ params, request }) {
   }
 
   if (!scopes.includes(`${name}:write`) && !scopes.includes(`*:write`)) {
-    return Response.json({ error: "missing_scopes" }, { status: 403 });
+    return Response.json({ error: "missing_scope" }, { status: 403 });
   }
 
   await db

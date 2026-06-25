@@ -32,7 +32,7 @@ export async function GET({ params, request }) {
   }
 
   if (!scopes.includes(`${name}:read`) && !scopes.includes(`*:read`)) {
-    return Response.json({ error: "missing_scopes" }, { status: 403 });
+    return Response.json({ error: "missing_scope" }, { status: 403 });
   }
 
   const recordsData = await db
@@ -73,7 +73,7 @@ export async function PUT({ params, request }) {
   }
 
   if (!scopes.includes(`${name}:write`) && !scopes.includes(`*:write`)) {
-    return Response.json({ error: "missing_scopes" }, { status: 403 });
+    return Response.json({ error: "missing_scope" }, { status: 403 });
   }
 
   const body = await request.json();

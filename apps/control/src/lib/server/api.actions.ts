@@ -8,6 +8,7 @@ import { getUser } from "./auth.actions";
 
 export async function createApiKey(
   name: string,
+  scopes: string[]
 ): Promise<{ id: string; token: string }> {
   const user = await getUser();
 
@@ -23,6 +24,7 @@ export async function createApiKey(
     .values({
       userId: user.id,
       name,
+      scopes,
       tokenHash: hash,
       tokenStart: token.slice(0, 16),
     })
@@ -36,7 +38,7 @@ export async function createApiKey(
 }
 
 export async function getApiKeys(): Promise<
-  { id: string; name: string; tokenStart: string }[]
+  { id: string; name: string; scopes: string[]; tokenStart: string | null }[]
 > {
   const user = await getUser();
 
@@ -45,16 +47,17 @@ export async function getApiKeys(): Promise<
   }
 
   const keys = await db
-    .select()
+    .select({
+      id: apiKeys.id,
+      name: apiKeys.name,
+      scopes: apiKeys.scopes,
+      tokenStart: apiKeys.tokenStart,
+    })
     .from(apiKeys)
     .where(eq(apiKeys.userId, user.id))
     .execute();
 
-  return keys.map((key) => ({
-    id: key.id,
-    name: key.name,
-    tokenStart: key.tokenStart ?? "",
-  }));
+  return keys;
 }
 
 export async function deleteApiKey(id: string) {
