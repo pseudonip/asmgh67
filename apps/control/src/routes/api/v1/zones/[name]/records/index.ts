@@ -14,7 +14,7 @@ export async function GET({ params, request }) {
   const { userId, scopes } = await getApiUserFromRequest(request);
 
   if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const [zone] = await db
@@ -24,15 +24,15 @@ export async function GET({ params, request }) {
     .execute();
 
   if (!zone) {
-    return new Response("Zone not found", { status: 404 });
+    return Response.json({ error: "zone_not_found" }, { status: 404 });
   }
 
   if (zone.userId !== userId) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unathorized" }, { status: 401 });
   }
 
   if (!scopes.includes(`${name}:read`) && !scopes.includes(`*:read`)) {
-    return new Response("Forbidden", { status: 403 });
+    return Response.json({ error: "missing_scopes" }, { status: 403 });
   }
 
   const recordsData = await db
@@ -55,7 +55,7 @@ export async function PUT({ params, request }) {
   const { userId, scopes } = await getApiUserFromRequest(request);
 
   if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const [zone] = await db
@@ -65,30 +65,30 @@ export async function PUT({ params, request }) {
     .execute();
 
   if (!zone) {
-    return new Response("Zone not found", { status: 404 });
+    return Response.json({ error: "zone_not_found" }, { status: 404 });
   }
 
   if (zone.userId !== userId) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   if (!scopes.includes(`${name}:write`) && !scopes.includes(`*:write`)) {
-    return new Response("Forbidden", { status: 403 });
+    return Response.json({ error: "missing_scopes" }, { status: 403 });
   }
 
   const body = await request.json();
 
   if (!Array.isArray(body)) {
-    return new Response("Expected array of records", { status: 400 });
+    return Response.json({ error: "invalid_body", detail: "Expected array of records" }, { status: 400 });
   }
 
   for (const record of body) {
     if (typeof record.name !== "string" || typeof record.type !== "string") {
-      return new Response("Invalid record format", { status: 400 });
+      return Response.json({ error: "invalid_record" }, { status: 400 });
     }
 
     if (!["auto", "5m", "1h", "1d"].includes(record.ttl || "auto")) {
-      return new Response("Invalid TTL value, should be auto, 5m, 1h or 1d", {
+      return Response.json({ error: "invalid_ttl", detail: "Expected auto, 5m, 1h or 1d" }, {
         status: 400,
       });
     }
@@ -96,8 +96,11 @@ export async function PUT({ params, request }) {
     const result = validateRecordData(record.type, record.data);
 
     if (!result.ok) {
-      return new Response(
-        `Invalid record data for type ${record.type}: ${result.error}`,
+      return Response.json(
+        {
+          error: "invalid_record_data",
+          detail: `Invalid record data for type ${record.type}: ${result.error}`,
+        },
         { status: 400 },
       );
     }
@@ -133,8 +136,8 @@ export async function PUT({ params, request }) {
     ) {
       return Response.json(
         {
-          error: "Duplicate record",
-          message:
+          error: "duplicate_record",
+          detail:
             "A record with the same name, type and data already exists in this zone.",
         },
         { status: 400 },
@@ -143,8 +146,8 @@ export async function PUT({ params, request }) {
 
     return Response.json(
       {
-        error: "Failed to create records",
-        message: e instanceof Error ? e.message : String(e),
+        error: "internal_server_error",
+        detail: e instanceof Error ? e.message : String(e),
       },
       { status: 500 },
     );

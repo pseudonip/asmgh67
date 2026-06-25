@@ -10,7 +10,7 @@ export async function DELETE({ params, request }) {
   const { userId, scopes } = await getApiUserFromRequest(request);
 
   if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const [zone] = await db
@@ -20,15 +20,15 @@ export async function DELETE({ params, request }) {
     .execute();
 
   if (!zone) {
-    return new Response("Zone not found", { status: 404 });
+    return Response.json({ error: "zone_not_found" }, { status: 404 });
   }
 
   if (zone.userId !== userId) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   if (!scopes.includes(`${name}:write`) && !scopes.includes(`*:write`)) {
-    return new Response("Forbidden", { status: 403 });
+    return Response.json({ error: "missing_scopes" }, { status: 403 });
   }
 
   await db
