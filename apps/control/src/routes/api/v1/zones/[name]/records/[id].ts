@@ -7,9 +7,9 @@ import { sendZoneUpdate } from "~/routes/api/dns/sse";
 export async function DELETE({ params, request }) {
   const { name, id } = params;
 
-  const user = await getApiUserFromRequest(request);
+  const { userId, scopes } = await getApiUserFromRequest(request);
 
-  if (!user) {
+  if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
 
@@ -23,8 +23,12 @@ export async function DELETE({ params, request }) {
     return new Response("Zone not found", { status: 404 });
   }
 
-  if (zone.userId !== user.id) {
+  if (zone.userId !== userId) {
     return new Response("Unauthorized", { status: 401 });
+  }
+
+  if (!scopes.includes(`${name}:write`) && !scopes.includes(`*:write`)) {
+    return new Response("Forbidden", { status: 403 });
   }
 
   await db

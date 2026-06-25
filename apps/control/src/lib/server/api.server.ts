@@ -7,24 +7,38 @@ export async function getApiUserFromRequest(request: Request) {
   const authHeader = request.headers.get("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return null;
+    return {
+      user: null,
+      scopes: [],
+    };
   }
 
   const token = authHeader.split(" ")[1];
   const hash = createHash("sha256").update(token).digest();
 
   const [key] = await db
-    .select({ user: users })
+    .select(
+      {
+        userId: users.id,
+        scopes: apiKeys.scopes
+      }
+    )
     .from(apiKeys)
     .innerJoin(users, eq(apiKeys.userId, users.id))
     .where(eq(apiKeys.tokenHash, hash))
     .execute();
 
   if (!key) {
-    return null;
+    return {
+      user: null,
+      scopes: [],
+    };
   }
 
-  delete key.user.passwordHash;
+  console.log("API Key User:", key);
 
-  return key.user;
+  return {
+    userId: key.userId,
+    scopes: key.scopes,
+  };
 }

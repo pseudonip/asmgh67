@@ -11,9 +11,9 @@ export async function GET({ params, request }) {
   const url = new URL(request.url);
   const search = url.searchParams.get("search");
 
-  const user = await getApiUserFromRequest(request);
+  const { userId, scopes } = await getApiUserFromRequest(request);
 
-  if (!user) {
+  if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
 
@@ -27,8 +27,12 @@ export async function GET({ params, request }) {
     return new Response("Zone not found", { status: 404 });
   }
 
-  if (zone.userId !== user.id) {
+  if (zone.userId !== userId) {
     return new Response("Unauthorized", { status: 401 });
+  }
+
+  if (!scopes.includes(`${name}:read`) && !scopes.includes(`*:read`)) {
+    return new Response("Forbidden", { status: 403 });
   }
 
   const recordsData = await db
@@ -48,9 +52,9 @@ export async function GET({ params, request }) {
 export async function PUT({ params, request }) {
   const { name } = params;
 
-  const user = await getApiUserFromRequest(request);
+  const { userId, scopes } = await getApiUserFromRequest(request);
 
-  if (!user) {
+  if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
 
@@ -64,8 +68,12 @@ export async function PUT({ params, request }) {
     return new Response("Zone not found", { status: 404 });
   }
 
-  if (zone.userId !== user.id) {
+  if (zone.userId !== userId) {
     return new Response("Unauthorized", { status: 401 });
+  }
+
+  if (!scopes.includes(`${name}:write`) && !scopes.includes(`*:write`)) {
+    return new Response("Forbidden", { status: 403 });
   }
 
   const body = await request.json();
