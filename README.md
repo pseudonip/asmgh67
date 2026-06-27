@@ -103,7 +103,7 @@ For actual production you will need to set up glue records for your nameservers 
 ### API
 - [x] Rest API for record managment
 - [x] API key creation / deletion
-- [ ] API key scoping
+- [x] API key scoping
 - [ ] API docs
 
 ### Operations
