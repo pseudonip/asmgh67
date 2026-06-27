@@ -1,6 +1,6 @@
 import { getApiUserFromRequest } from "~/lib/server/api.server";
 
-export async function GET({ request }) {
+export async function GET({ request }: { request: Request }) {
   const user = await getApiUserFromRequest(request);
 
   if (!user) {

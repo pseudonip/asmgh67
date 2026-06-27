@@ -3,11 +3,11 @@ import { createHash } from "crypto";
 import { db } from "~/lib/server/db";
 import { nameservers, queryStats } from "~/lib/server/db/schema";
 
-export async function POST({ request }) {
+export async function POST({ request }: { request: Request }) {
   const auth = request.headers.get("Authorization");
 
   if (!auth || !auth.startsWith("Bearer ")) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unathorized" }, { status: 401 });
   }
 
   const token = auth.split(" ")[1];
@@ -55,9 +55,9 @@ export async function POST({ request }) {
       })
       .execute();
 
-    return new Response("OK");
+    return new Response(undefined, { status: 204 });
   } catch (error) {
     console.error("Failed to insert stats:", error);
-    return new Response("Internal Server Error", { status: 500 });
+    return Response.json({ error: "internal_server_error" }, { status: 500 });
   }
 }

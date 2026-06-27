@@ -4,7 +4,7 @@ import { db } from "~/lib/server/db";
 import { records, zones } from "~/lib/server/db/schema";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
-export async function DELETE({ params, request }) {
+export async function DELETE({ params, request }: { params: { name: string; id: string }; request: Request }) {
   const { name, id } = params;
 
   const { userId, scopes } = await getApiUserFromRequest(request);
@@ -41,7 +41,7 @@ export async function DELETE({ params, request }) {
   return Response.json({ success: true });
 }
 
-export async function PATCH({ params, request }) {
+export async function PATCH({ params, request }: { params: { name: string; id: string }; request: Request }) {
   const { name, id } = params;
 
   const { userId, scopes } = await getApiUserFromRequest(request);

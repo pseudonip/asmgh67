@@ -3,13 +3,13 @@ import { createHash } from "crypto";
 import { db } from "~/lib/server/db";
 import { nameservers, records, zones } from "~/lib/server/db/schema";
 
-export async function GET({ request }) {
+export async function GET({ request }: { request: Request }) {
   console.log("Received request for zones");
 
   const auth = request.headers.get("Authorization");
 
   if (!auth || !auth.startsWith("Bearer ")) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unathorized" }, { status: 401 });
   }
 
   const token = auth.split(" ")[1];
@@ -22,7 +22,7 @@ export async function GET({ request }) {
     .execute();
 
   if (!ns) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json({ error: "unathorized" }, { status: 401 });
   }
 
   const allNs = await db

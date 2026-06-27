@@ -5,7 +5,7 @@ import { db } from "~/lib/server/db";
 import { records, zones } from "~/lib/server/db/schema";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
 
-export async function GET({ params, request }) {
+export async function GET({ params, request }: { params: { name: string }; request: Request }) {
   const { name } = params;
 
   const url = new URL(request.url);
@@ -49,7 +49,7 @@ export async function GET({ params, request }) {
   return Response.json(recordsData);
 }
 
-export async function PUT({ params, request }) {
+export async function PUT({ params, request }: { params: { name: string }; request: Request }) {
   const { name } = params;
 
   const { userId, scopes } = await getApiUserFromRequest(request);
