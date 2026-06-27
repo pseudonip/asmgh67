@@ -59,6 +59,15 @@ export default function handle(query: Packet, state: State): Packet {
     return answerResp(query, zone, records);
   }
 
+  records = records.map((r) => {
+    if (r.type === "CNAME" && isApex && (qtype === "A" || qtype === "AAAA")) {
+      // todo: handle cname flattening
+      return r;
+    } else {
+      return r;
+    }
+  })
+
   if (state.hasName(zone, qname)) {
     recordQuery(qname, "NOERROR");
     return emptyResp(query, zone);
