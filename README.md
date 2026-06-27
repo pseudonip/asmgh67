@@ -89,8 +89,7 @@ For actual production you will need to set up glue records for your nameservers 
 - [x] Auto generated SOA records
 - [ ] DNSSEC
 - [x] Wildcard records
-- [ ] ALIAS/ANAME records
-- [ ] CNAME flattening
+- [x] CNAME flattening
 
 ### Dashboard
 - [x] Zone creation and deletion

@@ -48,6 +48,7 @@
     "apps/nameserver": {
       "name": "@raincloud/nameserver",
       "dependencies": {
+        "@acfatah/memory-cache": "^0.1.11",
         "@raincloud/types": "workspace:*",
         "dns-packet": "^5.6.1",
         "dotenv": "^17.4.2",
@@ -65,6 +66,8 @@
     },
   },
   "packages": {
+    "@acfatah/memory-cache": ["@acfatah/memory-cache@0.1.11", "", {}, "sha512-97x2onURdn78s+BY6UnRA0iuTI56Pm/+piaL/A+yIrBThLe4SUVQH8sJoW2DmZPsFC+T0Fr9zfUr5Jmca/ouSw=="],
+
     "@babel/code-frame": ["@babel/code-frame@7.26.2", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.25.9", "js-tokens": "^4.0.0", "picocolors": "^1.0.0" } }, "sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ=="],
 
     "@babel/compat-data": ["@babel/compat-data@7.29.3", "", {}, "sha512-LIVqM46zQWZhj17qA8wb4nW/ixr2y1Nw+r1etiAWgRM6U1IqP+LNhL1yg440jYZR72jCWcWbLWzIosH+uP1fqg=="],
