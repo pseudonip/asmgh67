@@ -6,9 +6,9 @@ import { State } from "./state";
 export function startUdp(port: number, state: State) {
   Bun.udpSocket({
     port: port,
-    hostname: "0.0.0.0",
+    hostname: "::",
     socket: {
-      data(socket: any, data: any, port: number, address: string) {
+      async data(socket: any, data: any, port: number, address: string) {
         if (data.toString() === "ping") {
           socket.send("pong", port, address);
           return;
@@ -20,7 +20,7 @@ export function startUdp(port: number, state: State) {
             `Received UDP query for ${query.questions?.map((q: any) => `${q.name}:${q.type}`).join(", ")}`,
           );
 
-          let res = handle(query, state);
+          let res = await handle(query, state);
           res = applyEdns(res, query);
           ("");
 

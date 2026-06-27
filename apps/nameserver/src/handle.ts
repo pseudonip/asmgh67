@@ -1,6 +1,8 @@
 import { Packet } from "dns-packet";
 import { DnsRecord, State, Zone } from "./state";
 import { recordQuery } from "./stats";
+import { useMemoryCache } from "@acfatah/memory-cache";
+import * as dns from "node:dns/promises";
 
 enum RCODES {
   NOERROR = 0,
@@ -11,7 +13,11 @@ enum RCODES {
   REFUSED = 5,
 }
 
-export default function handle(query: Packet, state: State): Packet {
+const cache = useMemoryCache({
+  ttl: 5 * 60 * 1000, // 5min default
+})
+
+export default async function handle(query: Packet, state: State): Promise<Packet> {
   const question = query.questions?.[0];
   if (!question) {
     recordQuery("unknown", "FORMERR");
@@ -55,18 +61,58 @@ export default function handle(query: Packet, state: State): Packet {
   }
 
   if (records.length > 0) {
-    recordQuery(qname, "NOERROR");
-    return answerResp(query, zone, records);
-  }
+    const resolved: DnsRecord[] = [];
 
-  records = records.map((r) => {
-    if (r.type === "CNAME" && isApex && (qtype === "A" || qtype === "AAAA")) {
-      // todo: handle cname flattening
-      return r;
-    } else {
-      return r;
+    for (const r of records) {
+      if (r.type === "CNAME" && isApex && qtype === "A") {
+        const aRecordsCached = cache.get(`${r.data.target}-A`) as DnsRecord[];
+
+        if (aRecordsCached) {
+          console.log(`Cache hit for ${r.data.target}-A`);
+          resolved.push(...aRecordsCached);
+        } else {
+          const aRecords = await dns.resolve4(r.data.target, { ttl: true });
+
+          const aRecordsFormatted: DnsRecord[] = aRecords.map((record) => ({
+            name: r.name,
+            type: "A",
+            ttl: record.ttl,
+            data: { address: record.address },
+          }));
+
+          cache.set(`${r.data.target}-A`, aRecordsFormatted, { ttl: (aRecordsFormatted[0]?.ttl ?? 5 * 60 ) * 1000 });
+
+          resolved.push(...aRecordsFormatted);
+        }
+      } else if (r.type === "CNAME" && isApex && qtype === "AAAA") {
+        const aaaaRecordsCached = cache.get(`${r.data.target}-AAAA`) as DnsRecord[];
+
+        if (aaaaRecordsCached) {
+          resolved.push(...aaaaRecordsCached);
+        } else {
+          const aaaaRecords = await dns.resolve6(r.data.target, { ttl: true });
+
+          const aaaaRecordsFormatted: DnsRecord[] = aaaaRecords.map((record) => ({
+            name: r.name,
+            type: "AAAA",
+            ttl: record.ttl,
+            data: { address: record.address },
+          }));
+
+          cache.set(`${r.data.target}-AAAA`, aaaaRecordsFormatted, { ttl: aaaaRecordsFormatted[0]?.ttl ?? undefined });
+
+          resolved.push(...aaaaRecordsFormatted);
+        }
+      } else {
+        resolved.push(r);
+      }
     }
-  })
+
+    console.log(`Resolved records for ${qname} (${qtype}):`, resolved);
+
+    recordQuery(qname, "NOERROR");
+    return answerResp(query, zone, resolved);
+  }
 
   if (state.hasName(zone, qname)) {
     recordQuery(qname, "NOERROR");

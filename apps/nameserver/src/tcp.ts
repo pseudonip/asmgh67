@@ -5,7 +5,7 @@ import { State } from "./state";
 
 export function startTcp(port: number, state: State) {
   Bun.listen<{ buffer: Buffer }>({
-    hostname: "0.0.0.0",
+    hostname: "::",
     port,
     socket: {
       open(socket) {
@@ -13,7 +13,7 @@ export function startTcp(port: number, state: State) {
         socket.timeout(10);
       },
 
-      data(socket, chunk) {
+      async data(socket, chunk) {
         socket.data.buffer = Buffer.concat([socket.data.buffer, chunk]);
 
         while (socket.data.buffer.length >= 2) {
@@ -29,7 +29,7 @@ export function startTcp(port: number, state: State) {
               `Received TCP query for ${query.questions?.map((q: any) => `${q.name}:${q.type}`).join(", ")}`,
             );
 
-            let res = handle(query, state);
+            let res = await handle(query, state);
             res = applyEdns(res, query);
 
             socket.write(dnsPacket.streamEncode(res));
@@ -49,4 +49,6 @@ export function startTcp(port: number, state: State) {
       },
     },
   });
+
+  console.log(`DNS TCP server listening on port ${port}`);
 }
