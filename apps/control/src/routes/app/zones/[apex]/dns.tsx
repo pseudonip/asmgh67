@@ -176,7 +176,7 @@ export default function ZoneDNS() {
           </div>
         </div>
 
-        <div class="flex w-full gap-4 mt-2">
+        <div class="flex w-full gap-4 mt-4">
           <div class="w-1/10">
             <p class="text-sm leading-none">Type</p>
 
@@ -462,7 +462,13 @@ export default function ZoneDNS() {
           </Button>
         </div>
 
-        <p class="text-sm text-ctp-red mt-2">{error()}</p>
+        <Show when={rType() == "CNAME" && rName() == "@"}>
+          <p class="text-sm text-ctp-yellow mt-4">DNS rules dont allow CNAME records at the apex level, we will <b>flatten</b> this record into IP addresses</p>
+        </Show>
+
+        <Show when={error()}>
+          <p class="text-sm text-ctp-red mt-4">{error()}</p>
+        </Show>
       </div>
 
       <Table
