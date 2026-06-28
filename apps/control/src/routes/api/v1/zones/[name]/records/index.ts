@@ -8,42 +8,6 @@ import { records, zones } from "~/lib/server/db/schema";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
 import { recordSchemas, SUPPORTED_RECORD_TYPES } from "@raincloud/types/records";
 
-registry.registerPath({
-  method: "get",
-  path: "/zones/{name}/records",
-  security: [{ bearerAuth: [] }],
-  parameters: [
-    {
-      name: "name",
-      in: "path",
-      required: true,
-      description: "Zone name",
-      schema: z.string(),
-      example: "example.com",
-    },
-  ],
-  responses: {
-    200: {
-      description: "List of records in the zone",
-      content: {
-        "application/json": {
-          schema: z.array(z.object({
-            id: z.string(),
-            name: z.string(),
-            type: z.enum(SUPPORTED_RECORD_TYPES),
-            data: z.union(
-              Object.entries(recordSchemas).map(([key, schema]) =>
-                schema.openapi({ title: `${key}` })
-              ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]
-            ),
-            ttl: z.enum(["auto", "5m", "1h", "1d"]),
-          }))
-        }
-      }
-    }
-  }
-})
-
 export async function GET({ params, request }: { params: { name: string }; request: Request }) {
   const { name } = params;
 
@@ -192,3 +156,89 @@ export async function PUT({ params, request }: { params: { name: string }; reque
     );
   }
 }
+
+registry.registerPath({
+  method: "get",
+  path: "/zones/{name}/records",
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    {
+      name: "name",
+      in: "path",
+      required: true,
+      description: "Zone name",
+      schema: z.string(),
+      example: "example.com",
+    },
+  ],
+  responses: {
+    200: {
+      description: "List of records in the zone",
+      content: {
+        "application/json": {
+          schema: z.array(z.object({
+            id: z.string(),
+            name: z.string(),
+            type: z.enum(SUPPORTED_RECORD_TYPES),
+            data: z.union(
+              Object.entries(recordSchemas).map(([key, schema]) =>
+                schema.openapi({ title: `${key}` })
+              ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]
+            ),
+            ttl: z.enum(["auto", "5m", "1h", "1d"]),
+          }))
+        }
+      }
+    },
+  }
+});
+
+registry.registerPath({
+  method: "put",
+  path: "/zones/{name}/records",
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    {
+      name: "name",
+      in: "path",
+      required: true,
+      description: "Zone name",
+      schema: z.string(),
+      example: "example.com",
+    },
+  ],
+  request: {
+    body: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: z.array(z.object({
+            name: z.string(),
+            type: z.enum(SUPPORTED_RECORD_TYPES),
+            data: z.union(
+              Object.entries(recordSchemas).map(([key, schema]) =>
+                schema.openapi({ title: `${key}` })
+              ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]
+            ),
+            ttl: z.enum(["auto", "5m", "1h", "1d"]).optional(),
+          }))
+        }
+      }
+    }
+  },
+  responses: {
+    200: {
+      description: "Records created successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            created: z.array(z.object({
+              id: z.string(),
+              name: z.string(),
+            }))
+          })
+        }
+      }
+    }
+  }
+});
