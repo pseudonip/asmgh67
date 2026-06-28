@@ -11,6 +11,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@corvu/otp-field": "^0.1.4",
     "@kobalte/core": "^0.13.11",
     "@raincloud/types": "workspace:*",
@@ -32,7 +33,8 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "vinxi": "^0.5.7"
+    "vinxi": "^0.5.7",
+    "zod": "^4.4.3"
   },
   "engines": {
     "node": ">=22"

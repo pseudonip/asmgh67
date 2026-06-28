@@ -1,9 +1,48 @@
 import { validateRecordData } from "@raincloud/types/records";
 import { and, eq, ilike } from "drizzle-orm";
+import z from "zod";
+import { registry } from "~/lib/openapi";
 import { getApiUserFromRequest } from "~/lib/server/api.server";
 import { db } from "~/lib/server/db";
 import { records, zones } from "~/lib/server/db/schema";
 import { sendZoneUpdate } from "~/routes/api/dns/sse";
+import { recordSchemas, SUPPORTED_RECORD_TYPES } from "@raincloud/types/records";
+
+registry.registerPath({
+  method: "get",
+  path: "/zones/{name}/records",
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    {
+      name: "name",
+      in: "path",
+      required: true,
+      description: "Zone name",
+      schema: z.string(),
+      example: "example.com",
+    },
+  ],
+  responses: {
+    200: {
+      description: "List of records in the zone",
+      content: {
+        "application/json": {
+          schema: z.array(z.object({
+            id: z.string(),
+            name: z.string(),
+            type: z.enum(SUPPORTED_RECORD_TYPES),
+            data: z.union(
+              Object.entries(recordSchemas).map(([key, schema]) =>
+                schema.openapi({ title: `${key}` })
+              ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]
+            ),
+            ttl: z.enum(["auto", "5m", "1h", "1d"]),
+          }))
+        }
+      }
+    }
+  }
+})
 
 export async function GET({ params, request }: { params: { name: string }; request: Request }) {
   const { name } = params;
