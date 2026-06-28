@@ -14,7 +14,6 @@ export function recordQuery(zoneName: string, rcode: string) {
 async function flush() {
   if (counters.size === 0) return;
   const snapshot = [...counters.entries()];
-  counters.clear();
 
   const stats = snapshot.map(([key, count]) => {
     const [bucket, zoneName, rcode] = key.split("|");
@@ -35,6 +34,8 @@ async function flush() {
 
     if (!result.ok) {
       console.error("Failed to flush stats:", await result.text());
+    } else {
+      counters.clear();
     }
   } catch (error) {
     console.error("Failed to flush stats:", error);

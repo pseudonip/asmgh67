@@ -23,7 +23,7 @@ export async function GET({ request, nativeEvent }: {
   const auth = request.headers.get("Authorization");
 
   if (!auth || !auth.startsWith("Bearer ")) {
-    return Response.json({ error: "unathorized" }, { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const token = auth.split(" ")[1];
@@ -36,7 +36,7 @@ export async function GET({ request, nativeEvent }: {
     .execute();
 
   if (!ns) {
-    return Response.json({ error: "unathorized" }, { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   console.log(`Nameserver ${ns.hostname} connected to SSE stream`);

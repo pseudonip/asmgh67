@@ -1,3 +1,4 @@
+import { validateRecordData } from "@raincloud/types/records";
 import { and, eq } from "drizzle-orm";
 import { getApiUserFromRequest } from "~/lib/server/api.server";
 import { db } from "~/lib/server/db";
@@ -69,6 +70,12 @@ export async function PATCH({ params, request }: { params: { name: string; id: s
   }
 
   const data = await request.json();
+
+  const result = validateRecordData(data.type, data.data);
+
+  if (!result.ok) {
+    return Response.json({ error: "invalid_record_data", details: result.error }, { status: 400 });
+  }
 
   await db
     .update(records)

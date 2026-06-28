@@ -28,7 +28,7 @@ export async function GET({ params, request }: { params: { name: string }; reque
   }
 
   if (zone.userId !== userId) {
-    return Response.json({ error: "unathorized" }, { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   if (!scopes.includes(`${name}:read`) && !scopes.includes(`*:read`)) {

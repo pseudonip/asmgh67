@@ -7,7 +7,7 @@ export async function POST({ request }: { request: Request }) {
   const auth = request.headers.get("Authorization");
 
   if (!auth || !auth.startsWith("Bearer ")) {
-    return Response.json({ error: "unathorized" }, { status: 401 });
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const token = auth.split(" ")[1];

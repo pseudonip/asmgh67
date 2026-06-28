@@ -99,7 +99,7 @@ export default async function handle(query: Packet, state: State): Promise<Packe
             data: { address: record.address },
           }));
 
-          cache.set(`${r.data.target}-AAAA`, aaaaRecordsFormatted, { ttl: aaaaRecordsFormatted[0]?.ttl ?? undefined });
+          cache.set(`${r.data.target}-AAAA`, aaaaRecordsFormatted, { ttl: (aaaaRecordsFormatted[0]?.ttl ?? 5 * 60) * 1000 });
 
           resolved.push(...aaaaRecordsFormatted);
         }

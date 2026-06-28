@@ -35,8 +35,6 @@ export async function getApiUserFromRequest(request: Request) {
     };
   }
 
-  console.log("API Key User:", key);
-
   return {
     userId: key.userId,
     scopes: key.scopes,

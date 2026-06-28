@@ -22,7 +22,6 @@ export function startUdp(port: number, state: State) {
 
           let res = await handle(query, state);
           res = applyEdns(res, query);
-          ("");
 
           let encoded = dnsPacket.encode(res);
           const { udpSize } = readEdns(query);
