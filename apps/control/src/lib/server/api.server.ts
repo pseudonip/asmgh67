@@ -8,7 +8,7 @@ export async function getApiUserFromRequest(request: Request) {
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return {
-      user: null,
+      userId: null,
       scopes: [],
     };
   }
@@ -30,7 +30,7 @@ export async function getApiUserFromRequest(request: Request) {
 
   if (!key) {
     return {
-      user: null,
+      userId: null,
       scopes: [],
     };
   }
