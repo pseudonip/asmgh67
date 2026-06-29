@@ -1,5 +1,7 @@
-import { validateRecordData } from "@raincloud/types/records";
+import { recordSchemas, validateRecordData, SUPPORTED_RECORD_TYPES } from "@raincloud/types/records";
 import { and, eq } from "drizzle-orm";
+import z from "zod";
+import { registry } from "~/lib/openapi";
 import { getApiUserFromRequest } from "~/lib/server/api.server";
 import { db } from "~/lib/server/db";
 import { records, zones } from "~/lib/server/db/schema";
@@ -92,3 +94,78 @@ export async function PATCH({ params, request }: { params: { name: string; id: s
 
   return Response.json({ success: true });
 }
+
+registry.registerPath({
+  method: "delete",
+  path: "/zones/{name}/records/{id}",
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    {
+      name: "name",
+      in: "path",
+      required: true,
+      description: "Zone name",
+      schema: z.string(),
+      example: "example.com",
+    },
+  ],
+  responses: {
+    200: {
+      description: "Record deleted successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean(),
+          }),
+        },
+      },
+    }
+  }
+})
+
+registry.registerPath({
+  method: "patch",
+  path: "/zones/{name}/records/{id}",
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    {
+      name: "name",
+      in: "path",
+      required: true,
+      description: "Zone name",
+      schema: z.string(),
+      example: "example.com",
+    },
+  ],
+  request: {
+    body: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: z.object({
+            name: z.string(),
+            type: z.enum(SUPPORTED_RECORD_TYPES),
+            data: z.union(
+              Object.entries(recordSchemas).map(([key, schema]) =>
+                schema.openapi({ title: `${key}` })
+              ) as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]
+            ),
+            ttl: z.enum(["auto", "5m", "1h", "1d"])
+          }),
+        },
+      },
+    }
+  },
+  responses: {
+    200: {
+      description: "Record updated successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean(),
+          }),
+        },
+      },
+    }
+  }
+})
