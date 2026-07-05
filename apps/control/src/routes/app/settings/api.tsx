@@ -73,7 +73,8 @@ export default function APISettings() {
           <div>
             <p class="font-semibold">Active Keys</p>
             <p class="text-sm text-muted-foreground">
-              Active keys that can be used to manage your domains over the API.
+              Active keys that can be used to manage your domains over the API.{" "}
+              <a href="/api/docs">Read API docs</a>
             </p>
           </div>
 
