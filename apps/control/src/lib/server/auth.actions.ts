@@ -411,3 +411,27 @@ export async function sendPasswordResetEmail(email: string) {
     throw new Error("Failed to send password reset email");
   }
 }
+
+export async function resetPassword(token: string, newPassword: string) {
+  const sha256 = createHash("sha256").update(token).digest();
+
+  const [reset] = await db
+    .select()
+    .from(passwordResets)
+    .where(eq(passwordResets.tokenHash, sha256))
+    .execute();
+
+  if (!reset || reset.expiresAt < new Date()) {
+    throw new Error("Invalid or expired password reset token");
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 12);
+
+  await db
+    .update(users)
+    .set({ passwordHash: newHash })
+    .where(eq(users.id, reset.userId))
+    .execute();
+
+  await db.delete(passwordResets).where(eq(passwordResets.id, reset.id)).execute();
+}
