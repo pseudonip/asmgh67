@@ -69,7 +69,12 @@ export default function Login() {
               />
             </TextField>
             <TextField class="grid gap-2">
-              <TextFieldLabel>Password</TextFieldLabel>
+              <TextFieldLabel class="flex">
+                Password
+                <a href="/login/reset" class="ml-auto text-sm">
+                  Forgot password?
+                </a>
+              </TextFieldLabel>
               <TextFieldInput
                 type="password"
                 value={password()}

@@ -6,10 +6,15 @@ import { randomBytes, createHash } from "crypto";
 import { ne, eq, and } from "drizzle-orm";
 import { setCookie, getCookie } from "vinxi/http";
 import { getRequestEvent } from "solid-js/web";
+import { isDisposableEmail } from "disposable-email-domains-js";
+import { resolveMx } from "dns/promises";
+import nodemailer from "nodemailer";
 
 import { db } from "./db";
-import { users, sessions } from "./db/schema";
+import { users, sessions, passwordResets } from "./db/schema";
 import { getUserFromToken } from "./auth.server";
+
+import passwordResetEmail from "~/lib/emails/passwordReset.html?raw";
 
 export async function register({
   displayName,
@@ -32,6 +37,20 @@ export async function register({
 
   if (emailExists.length > 0) {
     throw new Error("Email already in use");
+  }
+
+  if (isDisposableEmail(email)) {
+    throw new Error("Invalid email address");
+  }
+
+  try {
+    const mx = await resolveMx(email.split("@")[1]);
+
+    if (mx.length === 0) {
+      throw new Error("Invalid email address");
+    }
+  } catch {
+    throw new Error("Invalid email address");
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -340,4 +359,55 @@ export async function verify2FA(token: string) {
     .set({ mfa_verified: true })
     .where(eq(sessions.tokenHash, sha256))
     .execute();
+}
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: process.env.SMTP_SECURE === "true",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  }
+});
+
+export async function sendPasswordResetEmail(email: string) {
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
+
+  if (!user) {
+    return;
+  }
+
+  const token = randomBytes(32).toString("hex");
+  const sha256 = createHash("sha256").update(token).digest();
+
+  await db.insert(passwordResets).values({
+    userId: user.id,
+    tokenHash: sha256,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
+  });
+
+  const resetUrl = `${process.env.BASE_URL}/login/reset?token=${token}`;
+  const html = passwordResetEmail.replaceAll("{{resetUrl}}", resetUrl);
+
+  console.log(`Sending password reset email to ${email} with reset URL: ${resetUrl}`);
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM,
+      replyTo: process.env.SMTP_REPLY_TO,
+      to: email,
+      subject: "Raincloud Password Reset",
+      html,
+    });
+
+    console.log(`Password reset email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send password reset email to ${email}:`, error);
+    throw new Error("Failed to send password reset email");
+  }
 }

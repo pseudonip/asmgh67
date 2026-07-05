@@ -24,8 +24,10 @@
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "disposable-email-domains-js": "^1.25.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
+    "nodemailer": "^9.0.3",
     "otpauth": "^9.5.1",
     "pg": "^8.20.0",
     "qrcode": "^1.5.4",
@@ -41,8 +43,9 @@
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "^1.0.0",
-    "@types/pg": "^8.20.0",
     "@types/bcrypt": "^6.0.0",
+    "@types/nodemailer": "^8.0.1",
+    "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
     "tsx": "^4.22.0"
   }
